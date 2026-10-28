@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Recolección y Análisis · 10-A</title>
+<meta name="description" content="Proyecto de Estadística, Sección 10-A: veinte respuestas que se ordenan hasta revelar un retrato del grupo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,500;1,500;1,600&display=swap">
+<style>
+/* Dirección: cuaderno de investigación. Escenas oscuras (tinta) para portada, capítulos, preguntas y cierre;
+   papel claro con retícula de puntos para tablas y explicaciones. Escenario fijo 1280×720 escalado. */
+:root{
+  --ink:#0B111E; --ink-2:#141C2E; --ink-3:#1E2840; --on-ink:#EEF1F7; --on-ink-2:#A3ADC4; --on-ink-3:#6B7591; --ink-rule:rgba(238,241,247,.09);
+  --paper:#F3F4EF; --paper-2:#FFFFFF; --text:#111A2B; --text-2:#4F5A72; --text-3:#7C8599; --rule:#D8DCD2; --rule-2:#E7E9E2; --dot:#D3D7CC;
+  /* variables del estudio (fijas en toda la presentación) */
+  --herm:#E0574D; --horas:#11998B; --casa:#E0A21C; --dep:#7457DB;
+  --herm-ink:#B5372E; --horas-ink:#0B7468; --casa-ink:#8E6300; --dep-ink:#553BC0;
+  --herm-t:#FBE4E1; --horas-t:#D8F1ED; --casa-t:#FAEFD2; --dep-t:#E9E4FB;
+  --herm-l:#FF8F86; --horas-l:#4FD3C3; --casa-l:#F6C552; --dep-l:#A994FF;
+  /* expositores (tonos separados de las variables) */
+  --ale:#3A6CF4; --gabriel:#5E9B12; --sumi:#C2409F;
+  --ok:#17844A; --ok-l:#3DD68C; --bad:#C2352C; --bad-l:#FF7A70; --q:#F2BE45;
+  --f-d:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --f-b:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-m:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --f-x:"STIX Two Text","Cambria Math",Cambria,"Times New Roman",serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:#05080F;color:var(--on-ink);font-family:var(--f-b);overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--q);outline-offset:3px}
+.still *,.still *::before,.still *::after{transition:none!important}
+[data-flip]{transform-origin:0 0}
+#fly{position:absolute;inset:0;z-index:25;pointer-events:none;overflow:hidden}
+.ghost{position:absolute;display:grid;place-items:center;border:1.5px solid transparent;border-radius:7px;font:600 15.5px var(--f-m);color:#fff;box-sizing:border-box;white-space:nowrap;overflow:hidden}
+#toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);z-index:70;background:var(--on-ink);color:var(--ink);padding:10px 16px;border-radius:10px;font:700 14px var(--f-b);box-shadow:0 10px 30px rgba(0,0,0,.4);pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
+#smallnote{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));z-index:65;display:flex;gap:10px;align-items:center;background:#16203A;border:1px solid var(--ink-rule);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.4;color:#D6DBE7}
+#smallnote button{all:unset;cursor:pointer;margin-left:auto;padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.1);font-weight:700}
+@media (max-height:480px){#bar{min-height:48px;padding-top:4px;padding-bottom:calc(4px + env(safe-area-inset-bottom,0px))}.bb{height:38px}}
+
+/* ---------- marco de la aplicación ---------- */
+#app{position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:minmax(0,1fr) auto}
+#viewport{grid-column:1;grid-row:1;position:relative;overflow:hidden;min-width:0;padding-top:env(safe-area-inset-top,0px)}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;overflow:hidden;border-radius:4px;background:var(--paper);box-shadow:0 0 0 1px rgba(255,255,255,.04),0 28px 80px rgba(0,0,0,.55)}
+#drawer{grid-column:2;grid-row:1/span 2;width:0;overflow:hidden;background:#0E1526;border-left:1px solid var(--ink-rule);transition:width .32s cubic-bezier(.22,.72,.12,1)}
+#app.drawer-open #drawer{width:min(400px,38vw)}
+#bar{grid-column:1;grid-row:2;display:flex;align-items:center;gap:8px;min-height:62px;
+  padding:8px max(14px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));
+  border-top:1px solid var(--ink-rule);background:#080D18}
+.bb{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;height:42px;min-width:42px;justify-content:center;padding:0 12px;border-radius:9px;
+  font:600 14px var(--f-b);color:var(--on-ink);background:rgba(255,255,255,.06);white-space:nowrap;transition:background .16s,transform .12s,color .16s}
+.bb:hover{background:rgba(255,255,255,.13)}
+.bb:active{transform:scale(.96)}
+.bb:focus-visible{outline:3px solid var(--q);outline-offset:2px}
+.bb[aria-pressed="true"]{background:var(--on-ink);color:var(--ink)}
+.bb svg{width:18px;height:18px;flex:0 0 18px}
+.bb.primary{background:var(--on-ink);color:var(--ink);padding:0 16px}
+.bb.primary:hover{background:#fff}
+.bar-mid{flex:1;min-width:0;display:flex;align-items:center;gap:14px;overflow:hidden}
+.drawer-open .bb .lbl,.drawer-open .spk{display:none}
+.count{font:500 14px var(--f-m);color:var(--on-ink-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.count b{color:var(--on-ink);font-weight:600}
+.stepdots{display:flex;gap:4px;align-items:center}
+.stepdots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);transition:background .2s,transform .2s}
+.stepdots i.on{background:var(--q)}
+.stepdots i.now{transform:scale(1.35)}
+.spk{display:flex;align-items:center;gap:8px;font:700 14px var(--f-b);white-space:nowrap}
+.spk i{width:10px;height:10px;border-radius:50%}
+.prog{flex:1;min-width:60px;height:22px;position:relative;cursor:pointer}
+.prog .track{position:absolute;left:0;right:0;top:9px;height:4px;border-radius:2px;background:rgba(255,255,255,.1)}
+.prog .fill{position:absolute;left:0;top:9px;height:4px;border-radius:2px;background:var(--on-ink);width:0;transition:width .45s cubic-bezier(.22,.72,.12,1)}
+.prog .tick{position:absolute;top:5px;width:2px;height:12px;background:rgba(255,255,255,.28);border-radius:1px}
+.sep{width:1px;height:28px;background:var(--ink-rule)}
+@media (max-width:1100px){.hide-m{display:none!important}}
+@media (max-width:760px){.hide-s{display:none!important}.bb .lbl{display:none}.bb{padding:0 10px}}
+@media (max-width:440px){.stepdots{display:none}#bar{gap:6px}}
+
+/* ---------- panel lateral ---------- */
+.dw{width:min(400px,38vw);height:100%;display:flex;flex-direction:column;min-width:280px}
+.dw-tabs{display:flex;gap:4px;padding:12px 12px 0}
+.dw-tab{all:unset;cursor:pointer;padding:10px 12px;border-radius:9px 9px 0 0;font:700 14px var(--f-b);color:var(--on-ink-2)}
+.dw-tab[aria-selected="true"]{background:#16203A;color:var(--on-ink)}
+.dw-tab:focus-visible{outline:3px solid var(--q)}
+.dw-x{margin-left:auto}
+.dw-body{flex:1;overflow:auto;background:#16203A;margin:0 12px 12px;border-radius:0 10px 10px 10px;padding:18px 20px;font-size:15.5px;line-height:1.6;color:#D6DBE7}
+.dw-body h3{margin:0 0 4px;font:800 19px/1.2 var(--f-d);font-stretch:110%;color:var(--on-ink)}
+.dw-body .who{font-weight:700;margin:6px 0 10px;display:flex;align-items:center;gap:8px}
+.dw-body .who i{width:10px;height:10px;border-radius:50%}
+.dw-body .stepinfo{font:500 13px var(--f-m);color:var(--q);margin-bottom:10px}
+.dw-body .note{white-space:normal}
+.dw-body .nextup{margin-top:16px;padding-top:12px;border-top:1px solid var(--ink-rule);font-size:14px;color:var(--on-ink-2)}
+.dw-body .warn{margin-top:16px;font-size:13px;color:var(--on-ink-3)}
+.dw-body .fix{display:block;margin-top:10px;font-size:13px;color:var(--q)}
+.rep-sec{margin-bottom:18px}
+.rep-sec h4{margin:0 0 6px;display:flex;align-items:center;gap:8px;font:800 16px var(--f-d);font-stretch:108%;color:var(--on-ink)}
+.rep-sec h4 i{width:11px;height:11px;border-radius:50%}
+.rep-sec h4 small{font:400 13px var(--f-b);color:var(--on-ink-2)}
+.rep-li{all:unset;cursor:pointer;display:flex;gap:10px;width:100%;padding:5px 8px;border-radius:6px;font-size:14px;box-sizing:border-box}
+.rep-li:hover,.rep-li:focus-visible{background:rgba(255,255,255,.07)}
+.rep-li b{font:600 13px var(--f-m);color:var(--on-ink-2);flex:0 0 24px}
+.rep-li.cur{background:rgba(242,190,69,.14)}
+.aud h4{margin:14px 0 6px;font:800 15px var(--f-d);color:var(--on-ink)}
+.aud ol{margin:0;padding-left:18px}
+.aud li{margin-bottom:10px;font-size:14px}
+.aud .chk{font:500 12.5px var(--f-m);display:grid;grid-template-columns:1fr auto;gap:2px 10px}
+.aud .chk .y{color:var(--ok-l)} .aud .chk .n{color:var(--bad-l)}
+
+/* ---------- índice ---------- */
+#index{position:fixed;inset:0;z-index:40;background:rgba(5,8,15,.97);overflow:auto;padding:28px max(20px,env(safe-area-inset-right,0px)) 28px max(20px,env(safe-area-inset-left,0px))}
+#index header{display:flex;align-items:center;gap:16px;margin:0 auto 18px;max-width:1180px}
+#index h2{margin:0;font:800 26px var(--f-d);font-stretch:115%}
+#index .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;max-width:1180px;margin:0 auto}
+#index .chap{grid-column:1/-1;font:700 12px var(--f-b);letter-spacing:.16em;text-transform:uppercase;color:var(--on-ink-3);margin:12px 0 0}
+.ix{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:10px;background:#111A2E;border:1px solid var(--ink-rule);transition:background .16s,transform .16s}
+.ix:hover{background:#18233D;transform:translateY(-1px)}
+.ix:focus-visible{outline:3px solid var(--q)}
+.ix.cur{border-color:var(--q)}
+.ix .n{font:600 13px var(--f-m);color:var(--on-ink-2)}
+.ix .tt{font:700 15px/1.25 var(--f-b);color:var(--on-ink)}
+.ix .sp{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--on-ink-2)}
+.ix .sp i{width:8px;height:8px;border-radius:50%}
+.ix.isq{background:#1A1A12;border-color:rgba(242,190,69,.25)}
+
+/* ---------- diapositivas: base ---------- */
+.slide{position:absolute;inset:0;padding:104px 80px 70px;display:flex;flex-direction:column;gap:18px;color:var(--text);
+  background:radial-gradient(circle,var(--dot) 1.05px,transparent 1.4px) 20px 20px/32px 32px,var(--paper)}
+.slide[hidden]{display:none}
+.slide::after{content:"";position:absolute;inset:22px;pointer-events:none;z-index:0;
+  background:linear-gradient(var(--rule),var(--rule)) 0 0/16px 1px no-repeat,linear-gradient(var(--rule),var(--rule)) 0 0/1px 16px no-repeat,
+  linear-gradient(var(--rule),var(--rule)) 100% 0/16px 1px no-repeat,linear-gradient(var(--rule),var(--rule)) 100% 0/1px 16px no-repeat,
+  linear-gradient(var(--rule),var(--rule)) 0 100%/16px 1px no-repeat,linear-gradient(var(--rule),var(--rule)) 0 100%/1px 16px no-repeat,
+  linear-gradient(var(--rule),var(--rule)) 100% 100%/16px 1px no-repeat,linear-gradient(var(--rule),var(--rule)) 100% 100%/1px 16px no-repeat}
+.slide.dark{color:var(--on-ink);background:linear-gradient(var(--ink-rule) 1px,transparent 1px) 0 0/40px 40px,linear-gradient(90deg,var(--ink-rule) 1px,transparent 1px) 0 0/40px 40px,var(--ink)}
+.slide.dark::after{--rule:rgba(238,241,247,.22)}
+.slide>*{position:relative;z-index:1}
+.notes{display:none!important}
+.off{visibility:hidden}
+.dim-able{transition:opacity .22s ease,filter .22s ease}
+.focusing .fz:not(.is-f){opacity:.26}
+.fz.is-f{opacity:1}
+
+/* cabecera y pie */
+.hdr{position:absolute!important;top:30px;left:80px;right:80px;height:38px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.mroute{display:flex;align-items:center;gap:0;font:700 12px var(--f-b);letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+.mroute span{display:flex;align-items:center;gap:7px;padding-right:12px}
+.mroute span+span::before{content:"";width:22px;height:1px;background:currentColor;opacity:.45;margin-right:12px}
+.mroute em{font:600 11px var(--f-m);font-style:normal;letter-spacing:0}
+.mroute .past{color:var(--text-2)}
+.mroute .now{color:var(--text)}
+.mroute .now em{background:var(--text);color:var(--paper);padding:3px 5px;border-radius:4px}
+.dark .mroute{color:var(--on-ink-3)} .dark .mroute .past{color:var(--on-ink-2)} .dark .mroute .now{color:var(--on-ink)} .dark .mroute .now em{background:var(--on-ink);color:var(--ink)}
+.chip-sp{display:flex;align-items:center;gap:9px;padding:5px 14px 5px 5px;border-radius:999px;background:var(--paper-2);border:1px solid var(--rule);font:700 14px var(--f-b);color:var(--text)}
+.chip-sp i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font:800 13px var(--f-d);font-style:normal}
+.chip-sp small{font-weight:400;color:var(--text-2);font-size:12.5px}
+.dark .chip-sp{background:rgba(255,255,255,.06);border-color:var(--ink-rule);color:var(--on-ink)} .dark .chip-sp small{color:var(--on-ink-2)}
+.ftr{position:absolute!important;bottom:26px;left:80px;right:80px;display:flex;justify-content:space-between;font:500 12.5px var(--f-b);color:var(--text-3)}
+.ftr b{font:500 13px var(--f-m);color:var(--text-2);font-variant-numeric:tabular-nums}
+.dark .ftr{color:var(--on-ink-3)} .dark .ftr b{color:var(--on-ink-2)}
+
+/* tipografía */
+.kick{font:700 13px var(--f-b);letter-spacing:.16em;text-transform:uppercase;color:var(--text-2)}
+.dark .kick{color:var(--on-ink-2)}
+.t{margin:0;font:800 48px/1.02 var(--f-d);font-stretch:100%;letter-spacing:-.012em;text-wrap:balance}
+.lead{margin:0;font-size:21px;line-height:1.45;color:var(--text-2);max-width:62ch}
+.dark .lead{color:var(--on-ink-2)}
+.mono,.num{font-family:var(--f-m);font-variant-numeric:tabular-nums}
+.mx{font-family:var(--f-x);font-style:italic}
+.mx sub,.sym sub{font-size:.62em;font-style:italic}
+.tb{display:flex;flex-direction:column;gap:6px}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font:700 13px var(--f-b);background:var(--rule-2);color:var(--text)}
+.ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.vglyph{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:0 0 44px;color:#fff}
+.vglyph.casa{color:var(--ink)}
+.c-herm{background:var(--herm)} .c-horas{background:var(--horas)} .c-casa{background:var(--casa)} .c-dep{background:var(--dep)}
+.panel{background:var(--paper-2);border:1px solid var(--rule);border-radius:14px;box-shadow:0 1px 0 rgba(17,26,43,.04),0 10px 30px -18px rgba(17,26,43,.35)}
+
+/* tablas */
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th{font:700 12.5px var(--f-b);letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);text-align:center;padding:8px 8px;border-bottom:2px solid var(--text)}
+td{text-align:center;padding:6px 8px;border-bottom:1px solid var(--rule-2)}
+th:first-child,td:first-child{text-align:left}
+.yes{color:var(--ok);font-weight:700} .no{color:var(--bad);font-weight:700}
+
+/* ---------- 1 portada / 30 cierre ---------- */
+.cover{padding-top:96px}
+.cover .ctext{width:620px;display:flex;flex-direction:column;gap:22px;margin-top:40px}
+.cover h1{margin:0;font:800 86px/.92 var(--f-d);font-stretch:100%;letter-spacing:-.03em}
+.cover h1 .ln{display:block;overflow:hidden;padding-bottom:6px}
+.cover h1 .ln>span{display:block}
+.cover h1 em{font-style:normal;color:var(--horas-l)}
+.names{display:flex;flex-wrap:wrap;gap:8px}
+.names span{display:inline-flex;align-items:center;gap:8px;padding:7px 13px 7px 9px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--ink-rule);font:700 16px var(--f-b)}
+.names i{width:10px;height:10px;border-radius:50%}
+.meta{font-size:15px;color:var(--on-ink-2)}
+.constel{position:absolute!important;right:44px;top:84px;width:560px;height:560px;overflow:visible}
+.c-line{fill:none;stroke-width:1;opacity:.32;stroke-dasharray:1;stroke-dashoffset:0}
+.c-person{fill:var(--on-ink)}
+.c-mark,.c-person,.c-arc{transform-box:fill-box;transform-origin:center}
+.c-arc{fill:none;stroke-width:4.2;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
+.c-lab{font:700 13px var(--f-b);letter-spacing:.12em;text-transform:uppercase}
+.c-sub{font:400 12.5px var(--f-m);fill:var(--on-ink-3)}
+.c-center{font:600 40px var(--f-m);fill:var(--on-ink)}
+.c-center2{font:700 11.5px var(--f-b);letter-spacing:.16em;fill:var(--on-ink-2)}
+.clegend{position:absolute!important;right:80px;bottom:62px;font-size:13.5px;color:var(--on-ink-2);text-align:right}
+.end h1{font-size:76px;line-height:.98;font-stretch:100%}
+.end h1 em{font-style:normal;color:var(--q)}
+
+/* ---------- 2 ruta ---------- */
+.route{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:22px}
+.route-line{position:absolute!important;left:0;top:0;width:100%;height:56px;overflow:visible;pointer-events:none}
+.route-line path{fill:none;stroke:var(--text);stroke-width:2;stroke-dasharray:1}
+.route-line .base{stroke:var(--rule);stroke-dasharray:4 6}
+.stop{display:flex;flex-direction:column;gap:12px;position:relative;z-index:1}
+.stop .node{width:56px;height:56px;border-radius:50%;background:var(--paper-2);border:2px solid var(--text);display:grid;place-items:center;font:600 18px var(--f-m)}
+.stop.active .node{background:var(--text);color:var(--paper)}
+.stop h3{margin:6px 0 0;font:800 30px var(--f-d);font-stretch:112%}
+.stop p{margin:0;font-size:18.5px;line-height:1.45;color:var(--text-2);max-width:26ch}
+.stop .tag{align-self:flex-start;margin-top:4px}
+.route-foot{margin-top:auto;display:flex;gap:28px;font-size:15px;color:var(--text-2)}
+.route-foot b{color:var(--text)}
+
+/* ---------- 3 vocabulario ---------- */
+.vocab{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:36px;flex:1;min-height:0}
+.vgroups{display:flex;flex-direction:column;gap:14px}
+.vg{display:flex;flex-direction:column;gap:2px}
+.vg-l{font:700 12px var(--f-b);letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);padding-bottom:4px}
+.vrow{display:grid;grid-template-columns:1fr 1fr;gap:0 28px}
+.term{display:grid;grid-template-columns:86px minmax(0,1fr);align-items:center;gap:14px;padding:9px 0;border-top:1px solid var(--rule)}
+.sym{font:500 34px/1 var(--f-x);font-style:italic;text-align:center;position:relative}
+.term p{margin:0;font-size:16.5px;line-height:1.35;color:var(--text-2)}
+.term p b{color:var(--text)}
+.vg.is-f .sym::after{content:"";position:absolute;left:14px;right:14px;bottom:-8px;height:3px;border-radius:2px;background:var(--q)}
+.which{background:var(--ink);color:var(--on-ink);border-radius:16px;padding:26px 26px;display:flex;flex-direction:column;gap:16px;align-self:start}
+.which h3{margin:0;font:800 26px var(--f-d);font-stretch:112%}
+.which .w{font-size:16px;color:var(--on-ink-2);padding-top:12px;border-top:1px solid var(--ink-rule)}
+.which .w b{display:block;color:var(--on-ink);font:800 21px var(--f-d);font-stretch:108%;margin-top:3px}
+
+/* ---------- preguntas (diapositivas oscuras) ---------- */
+.quiz{gap:22px;padding-top:110px}
+.qtop{display:flex;align-items:center;gap:18px}
+.qlabel{font:700 13px var(--f-b);letter-spacing:.16em;text-transform:uppercase;color:var(--q)}
+.timer{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tring{position:relative;width:74px;height:74px}
+.tring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.tring circle{fill:none;stroke-width:7}
+.tring .bg{stroke:rgba(255,255,255,.12)}
+.tring .fg{stroke:var(--q);stroke-linecap:round}
+.tring b{position:absolute;inset:0;display:grid;place-items:center;font:600 22px var(--f-m);color:var(--on-ink);font-variant-numeric:tabular-nums}
+.tring.done b{font:700 12px var(--f-b);letter-spacing:.06em;color:var(--q);text-transform:uppercase}
+.tbtn{all:unset;cursor:pointer;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);transition:background .16s,transform .12s}
+.tbtn:hover{background:rgba(255,255,255,.16)} .tbtn:active{transform:scale(.94)}
+.tbtn:focus-visible{outline:3px solid var(--q)}
+.tbtn svg{width:18px;height:18px;fill:none;stroke:var(--on-ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.qt{margin:0;font:800 44px/1.08 var(--f-d);font-stretch:108%;letter-spacing:-.01em;max-width:25ch;text-wrap:balance}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+.opts.three{grid-template-columns:repeat(3,1fr)}
+.opt{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:flex;align-items:center;gap:16px;min-height:78px;padding:14px 20px;border-radius:14px;
+  background:rgba(255,255,255,.055);border:2px solid rgba(255,255,255,.14);font:700 25px var(--f-b);color:var(--on-ink);
+  transition:transform .14s cubic-bezier(.22,.72,.12,1),background .18s,border-color .18s,opacity .22s}
+.opt:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+.opt:active{transform:translateY(0) scale(.985)}
+.opt:focus-visible{outline:3px solid var(--q);outline-offset:3px}
+.opt kbd{width:42px;height:42px;flex:0 0 42px;border-radius:10px;display:grid;place-items:center;background:var(--on-ink);color:var(--ink);font:800 19px var(--f-d)}
+.opt .om{margin-left:auto;display:flex;align-items:center;gap:6px;font:700 13px var(--f-b);letter-spacing:.06em;text-transform:uppercase}
+.opt .om svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.opt.correct{background:rgba(23,132,74,.28);border-color:var(--ok-l)}
+.opt.correct kbd{background:var(--ok-l)}
+.opt.correct .om{color:var(--ok-l)}
+.opt.wrong{background:rgba(194,53,44,.2);border-color:var(--bad-l)}
+.opt.wrong .om{color:var(--bad-l)}
+.opt.dimmed{opacity:.38}
+.answered .opt{cursor:default}
+.answered .opt:hover{transform:none}
+.qfoot{display:flex;align-items:center;gap:18px;min-height:44px}
+.fb{display:flex;align-items:center;gap:10px;font:700 21px var(--f-b)}
+.fb svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.fb.ok{color:var(--ok-l)} .fb.ko{color:var(--q)}
+.hint{font-size:17px;color:var(--on-ink-2)}
+.clear{all:unset;cursor:pointer;margin-left:auto;font:600 14px var(--f-b);color:var(--on-ink-2);text-decoration:underline;text-underline-offset:3px}
+.clear:focus-visible{outline:3px solid var(--q)}
+.burst{position:absolute!important;width:9px;height:9px;border-radius:50%;pointer-events:none;z-index:5}
+
+/* ---------- respuestas ---------- */
+.ans{gap:20px;justify-content:center;padding-bottom:96px}
+.badge{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:var(--ok);color:#fff;font:700 14px var(--f-b);letter-spacing:.04em}
+.badge svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.bigans{font:800 116px/.9 var(--f-d);font-stretch:108%;letter-spacing:-.03em;color:var(--ok);transform-origin:0 0;white-space:nowrap}
+.bigans .mx{font-weight:500}
+.arow{display:flex;gap:36px;align-items:center;flex:1;min-height:0}
+.acol{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
+.calc{font:500 23px/1.75 var(--f-m);padding:18px 22px}
+.calc b{font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{padding:20px 22px;display:flex;flex-direction:column;gap:8px}
+.card .k{font:700 12.5px var(--f-b);letter-spacing:.12em;text-transform:uppercase;color:var(--text-2)}
+.card .big{font:800 58px/1 var(--f-d);font-stretch:108%}
+.card p{margin:0;font-size:18px;line-height:1.45;color:var(--text-2)}
+
+/* ---------- 6 matriz de respuestas ---------- */
+.mxhead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.eqn{font:600 30px var(--f-m);color:var(--text);white-space:nowrap}
+.eqn small{display:block;font:700 12px var(--f-b);letter-spacing:.14em;text-transform:uppercase;color:var(--text-2);text-align:right;margin-bottom:4px}
+.matrix{display:grid;grid-template-columns:470px repeat(20,26px);column-gap:4px;row-gap:10px;align-items:center;margin-top:8px}
+.mxl{font:700 12.5px var(--f-b);letter-spacing:.12em;text-transform:uppercase;color:var(--text-2)}
+.pdot{width:26px;height:26px;border-radius:50%;background:var(--text);color:var(--paper);display:grid;place-items:center;font:500 10.5px var(--f-m)}
+.mq{display:flex;align-items:center;gap:14px;padding-right:16px;min-height:62px}
+.mq p{margin:0;font:700 19px/1.3 var(--f-b);flex:1}
+.mq .tag{flex:0 0 auto}
+.cell{height:40px;border-radius:7px;display:grid;place-items:center;font:600 13px var(--f-m);color:#fff}
+.cell.casa{color:var(--ink)}
+.mxfoot{display:flex;gap:28px;font-size:16px;color:var(--text-2);margin-top:auto}
+.mxfoot b{color:var(--text)}
+
+/* ---------- 7 datos brutos ---------- */
+.rawwrap{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.raw{font-size:15.5px}
+.raw th,.raw td{padding:6px 7px}
+.raw td:first-child{font:500 13px var(--f-m);color:var(--text-3);width:28px}
+.raw td:nth-child(2){text-align:left;font-weight:700}
+.raw th:nth-child(2){text-align:left}
+.raw tbody tr:nth-child(even) td{background:rgba(17,26,43,.025)}
+.raw td.cv{font:500 16px var(--f-m)}
+.raw .hl-herm{background:var(--herm-t)!important} .raw .hl-horas{background:var(--horas-t)!important} .raw .hl-casa{background:var(--casa-t)!important} .raw .hl-dep{background:var(--dep-t)!important}
+.raw .mark10{box-shadow:inset 0 0 0 2px var(--casa-ink);border-radius:5px;font-weight:600}
+.colbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.colbtns span{font-size:14px;color:var(--text-2);margin-right:4px}
+.cb{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;border:1.5px solid var(--rule);background:var(--paper-2);font:700 14px var(--f-b);color:var(--text);transition:background .16s,border-color .16s}
+.cb i{width:10px;height:10px;border-radius:50%}
+.cb:hover{border-color:var(--text-3)}
+.cb[aria-pressed="true"]{border-color:var(--text);background:var(--text);color:var(--paper)}
+.cb:focus-visible{outline:3px solid var(--q)}
+.fine{margin:0;font-size:14.5px;color:var(--text-2)}
+
+/* ---------- tablas de frecuencia (escena por pasos) ---------- */
+.stepper{display:flex;gap:5px;flex-wrap:nowrap;align-items:center}
+.stepper span{display:flex;align-items:center;gap:7px;padding:6px 9px 6px 6px;border-radius:999px;font:700 13px var(--f-b);color:var(--text-3);background:rgba(17,26,43,.04);white-space:nowrap;transition:background .22s,color .22s}
+.stepper em{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 11px var(--f-m);font-style:normal;background:var(--rule);color:var(--text-2);transition:background .22s,color .22s}
+.stepper .past{color:var(--text-2)} .stepper .past em{background:var(--text-2);color:var(--paper)}
+.stepper .now{color:var(--text);background:var(--paper-2);box-shadow:0 0 0 1.5px var(--text)} .stepper .now em{background:var(--text);color:var(--paper)}
+.fqbody{display:grid;grid-template-columns:680px minmax(0,1fr);gap:32px;flex:1;min-height:0}
+.fq-stage{position:relative;height:418px}
+.fq-stage>*{position:absolute;left:0;top:0}
+.chip{display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--paper-2);border:1.5px solid var(--vc);color:var(--text);font:600 20px var(--f-m);
+  transition:background .35s,color .35s,opacity .3s,font-size .35s,box-shadow .2s;will-change:transform}
+.chip small{position:absolute;left:5px;top:3px;font:500 10px var(--f-m);color:var(--text-3);transition:color .35s}
+.fq.stk .chip{font-size:16px}
+.fq.stk .chip small{top:2px;font-size:9px}
+.fq.solid .chip{background:var(--vc);color:var(--vtx)}
+.fq.solid .chip small{color:var(--vsm)}
+.fq.mode .chip:not(.ismode){opacity:.5}
+.chip.lnk,.fbar.lnk{box-shadow:0 0 0 3px var(--text)}
+.chip.track{box-shadow:0 0 0 3px var(--text),0 0 0 7px var(--q);z-index:2}
+.stepper .skip{opacity:.5}
+.stepper .skip em{background:transparent;border:1px dashed var(--text-3)}
+.shortbtn{margin-left:auto;padding:5px 12px!important;font-size:13px!important}
+.chip.flag{box-shadow:0 0 0 3px var(--bad)}
+.fbar{border-radius:7px 7px 0 0;background:var(--vt);border:1.5px solid var(--vc);border-bottom:none;transform-origin:50% 100%}
+.fq.mode .fbar.ismode{border-width:3px}
+.fbase{height:2px;background:var(--text)}
+.fgrid{height:1px;background:var(--rule-2)}
+.fylab{font:500 12px var(--f-m);color:var(--text-3);width:28px;text-align:right}
+.fxlab{font:600 16px var(--f-m);color:var(--text);text-align:center}
+.fcnt{font:600 18px var(--f-m);text-align:center;color:var(--text)}
+.fcnt.zero{color:var(--text-3);font-weight:400}
+.fcnt .mo{display:block;font:700 11px var(--f-b);letter-spacing:.1em;color:var(--vi);margin-bottom:1px}
+.fcap{font:700 12.5px var(--f-b);letter-spacing:.12em;text-transform:uppercase;color:var(--text-2);white-space:nowrap}
+.faxt{font:500 15px var(--f-x);font-style:italic;color:var(--text-2)}
+.fmean{width:0;border-left:2px dashed var(--text)}
+.fmeanl{font:600 15px var(--f-m);white-space:nowrap;background:var(--text);color:var(--paper);padding:3px 8px;border-radius:6px;transform:translateX(-50%)}
+.fq-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.ft{font:500 17px var(--f-m)}
+.ft th{font-family:var(--f-x);font-size:17px;letter-spacing:0;text-transform:none;font-style:italic;font-weight:500}
+.ft td{padding:5px 8px}
+.ft tbody tr{cursor:default;transition:background .14s}
+.ft tbody tr:hover,.ft tbody tr:focus,.ft tbody tr.lnk{background:var(--vt);outline:none}
+.ft tbody tr:focus-visible{box-shadow:inset 0 0 0 2px var(--text)}
+.ft tr.mode td{font-weight:600}
+.ft tfoot td{font-weight:600;border-top:2px solid var(--text);border-bottom:none}
+.callout{border-left:4px solid var(--vc);background:var(--paper-2);border-radius:0 12px 12px 0;padding:12px 16px;font-size:17px;line-height:1.45}
+.callout b{font-weight:700}
+
+/* ---------- 13 deporte ---------- */
+.depbody{display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:36px;flex:1;min-height:0}
+.depleft{display:flex;flex-direction:column;gap:16px}
+.dep-stage{position:relative;height:456px}
+.dep-stage>*{position:absolute;left:0;top:0}
+.dmark{border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 15px var(--f-b);line-height:1;transition:font-size .35s;will-change:transform}
+.dmark small{font:500 10px var(--f-m);margin-top:3px;opacity:.75;transition:opacity .3s}
+.dmark.si{background:var(--dep);color:#fff}
+.dmark.nn{background:var(--paper-2);color:var(--text-2);border:2px solid #A9AFBD}
+.dep-stage.onring .dmark{font-size:12px}
+.dep-stage.onring .dmark small{display:none}
+.dglab{font:800 22px var(--f-d);font-stretch:110%}
+.dglab small{font:500 15px var(--f-m);color:var(--text-2);margin-left:6px}
+.dcenter{text-align:center;width:520px}
+.dcenter b{display:block;font:800 64px/1 var(--f-d);font-stretch:110%;color:var(--dep-ink)}
+.dcenter span{font-size:16px;color:var(--text-2)}
+.deq{width:520px;text-align:center;font:600 24px var(--f-m)}
+.deq b{color:var(--dep-ink)}
+
+/* ---------- 16 posiciones ---------- */
+.qs{position:relative;height:214px;margin-top:6px}
+.qs>*{position:absolute}
+.qcap{left:0;font:700 12px var(--f-b);letter-spacing:.12em;text-transform:uppercase;color:var(--text-2);width:140px;line-height:1.25}
+.qposn{font:500 14px var(--f-m);color:var(--text-3);text-align:center;width:42px}
+.qchip{width:42px;height:42px;border-radius:8px;background:var(--paper-2);border:1.5px solid var(--herm);display:grid;place-items:center;font:600 18px var(--f-m);transition:box-shadow .25s,background .25s}
+.qchip.ab{box-shadow:0 0 0 3px var(--text);background:var(--herm-t)}
+.qpin{width:2px;background:var(--text);top:24px;height:104px}
+.qpin::after{content:"";position:absolute;left:-5px;top:-6px;width:12px;height:12px;border-radius:50%;background:var(--q);border:2px solid var(--text)}
+.qtag{top:-8px;transform:translateX(-50%);font:600 14px var(--f-m);background:var(--text);color:var(--paper);padding:3px 8px;border-radius:6px;white-space:nowrap}
+.qres{top:150px;transform:translateX(-50%);font:600 19px var(--f-m);padding:7px 12px;border-radius:9px;background:var(--q);color:var(--ink);white-space:nowrap}
+.qform{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.qf{display:flex;align-items:center;gap:16px;padding:14px 18px}
+.qf .ball{width:54px;height:54px;flex:0 0 54px;border-radius:50%;background:var(--text);color:var(--paper);display:grid;place-items:center;font:500 22px var(--f-x);font-style:italic}
+.qf small{display:block;font:500 15px var(--f-m);color:var(--text-2)}
+.qf strong{font:600 23px var(--f-m)}
+
+/* ---------- 17 interpolación ---------- */
+.formula{font:500 66px/1 var(--f-x);font-style:italic;letter-spacing:.01em;display:flex;align-items:baseline;gap:.18em;flex-wrap:wrap}
+.formula span{transition:color .25s,text-shadow .25s;border-radius:6px}
+.formula .on{color:var(--q)}
+.flegend{font-size:18px;color:var(--on-ink-2)}
+.flegend b{color:var(--on-ink);font-family:var(--f-x);font-style:italic;font-weight:500;font-size:21px}
+.isvg{width:1120px;height:282px;overflow:visible}
+.isvg text{font-family:var(--f-m)}
+.minis{display:grid;grid-template-columns:1.35fr 1fr 1fr 1fr;gap:12px}
+.mini{background:rgba(255,255,255,.055);border:1px solid var(--ink-rule);border-radius:12px;padding:11px 14px}
+.mini small{display:block;color:var(--on-ink-2);font-size:13.5px;margin-bottom:5px}
+.mini b{font:500 17px var(--f-m);color:var(--on-ink)}
+.mini.lead1{border-color:rgba(242,190,69,.5)}
+.mini.lead1 b strong{color:var(--q);font-weight:600}
+
+/* ---------- 18 tabla de medidas ---------- */
+.mtab{font-size:18px}
+.mtab th.v{text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px}
+.mtab th.v:focus-visible{outline:3px solid var(--q)}
+.mtab th.v[aria-pressed="true"]{background:var(--text);color:var(--paper)!important;border-radius:6px 6px 0 0}
+.recap{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:14.5px;color:var(--text-2)}
+.rc{display:inline-flex;gap:7px;align-items:center;padding:5px 10px;border-radius:8px;background:var(--paper-2);border:1px solid var(--rule);font:500 14px var(--f-m);color:var(--text)}
+.rc i{width:9px;height:9px;border-radius:2px}
+.mtab th{font-size:13px;padding:10px}
+.mtab td{padding:7px 10px;transition:opacity .22s,background .22s}
+.mtab th.v{cursor:pointer}
+.mtab td:first-child{font-weight:700}
+.mtab .dimc{opacity:.25}
+.mtab tr.cmp td{background:var(--q);background:rgba(242,190,69,.22)}
+.mtab tr.dimr td{opacity:.3}
+
+/* ---------- 21 diagrama de caja ---------- */
+.bsvg{width:1120px;height:392px;overflow:visible}
+.bsvg text{font-family:var(--f-b)}
+.bnote{font-size:16.5px;line-height:1.45;color:var(--text);padding:10px 16px;border-left:4px solid var(--casa);background:var(--paper-2);border-radius:0 10px 10px 0}
+
+/* ---------- 22 atípico ---------- */
+.obody{display:grid;grid-template-columns:690px minmax(0,1fr);gap:28px;flex:1;min-height:0}
+.osvg{width:690px;height:430px;overflow:visible}
+.osvg text{font-family:var(--f-m)}
+.ocards{display:flex;flex-direction:column;gap:10px}
+.oc{display:flex;align-items:center;gap:14px;padding:11px 16px;border-radius:12px;background:var(--paper-2);border:1px solid var(--rule)}
+.oc .n{width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:var(--text);color:var(--paper);display:grid;place-items:center;font:600 15px var(--f-m)}
+.oc.hot .n{background:var(--bad)}
+.oc small{display:block;font-size:13.5px;color:var(--text-2)}
+.oc strong{font:600 20px var(--f-m)}
+.oeff .nb{grid-column:1/-1;font:400 13px/1.4 var(--f-b);color:var(--on-ink-2);margin-top:4px}
+.oeff{background:var(--ink);color:var(--on-ink);border-radius:12px;padding:12px 16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font:500 15.5px var(--f-m);align-items:baseline}
+.oeff .h{grid-column:1/-1;font:700 12px var(--f-b);letter-spacing:.14em;text-transform:uppercase;color:var(--on-ink-2)}
+.oeff span{color:var(--on-ink-2);font-family:var(--f-b)}
+
+/* ---------- 23 veredicto ---------- */
+.rules{display:flex;gap:10px;flex-wrap:wrap}
+.vt{display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font:700 13.5px var(--f-b);white-space:nowrap}
+.v-neg{background:#FDE5E2;color:#A3271F} .v-sim{background:#DDF3EA;color:#0D6B49} .v-pos{background:#FFF0C9;color:#7A5300} .v-cat{background:#ECE8FB;color:#4B36A8}
+.vtab{font-size:15px}
+.vtab td{padding:8px 8px;vertical-align:middle}
+.vtab th{font-size:11.5px;padding:8px 6px}
+.vtab .dist{font:500 13px/1.45 var(--f-m);text-align:left;color:var(--text-2)}
+.vtab .dist b{color:var(--text);font-weight:600}
+.rules-note{font-size:15px;color:var(--text-2);margin:0}
+.vtab td.mini2{padding:2px 6px}
+.vtab .vn{display:flex;align-items:center;gap:10px;font-weight:700}
+.vtab .vn i{width:12px;height:12px;border-radius:3px}
+
+/* ---------- 26 por qué ---------- */
+.why{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+.wy{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 16px;padding:18px 0;border-top:1px solid var(--rule)}
+.wy h4{margin:0;font:800 25px var(--f-d);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.wy p{grid-column:2;margin:0;font-size:16.5px;line-height:1.5;color:var(--text-2)}
+.wy{padding:14px 0}
+
+/* ---------- 27 conclusión ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat{border-radius:14px;padding:18px 20px 16px;color:#fff;display:flex;flex-direction:column;gap:6px;min-height:248px}
+.stat.casa{color:var(--ink)}
+.stat b{font:800 56px/1 var(--f-d);font-stretch:110%;letter-spacing:-.02em}
+.stat span{font-size:17px;line-height:1.3}
+.stat .src{margin-top:auto;font:500 13px var(--f-m);opacity:.9;border-top:1px solid currentColor;padding-top:8px;border-top-color:rgba(255,255,255,.35)}
+.stat.casa .src{border-top-color:rgba(11,17,30,.3)}
+.stat svg{width:100%;height:46px;overflow:visible}
+.concl{font-size:21px;line-height:1.5;padding:18px 22px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-herm" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.1c3.1-.6 5.5 1.4 5.5 4.6"/></symbol>
+  <symbol id="i-horas" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M10.5 18.5h3"/></symbol>
+  <symbol id="i-casa" viewBox="0 0 24 24"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.8 9.4V20h12.4V9.4"/><path d="M10 20v-5h4v5"/></symbol>
+  <symbol id="i-dep" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .9-1 1.6v.6"/><path d="M12 16.9v.2"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></symbol>
+  <symbol id="i-ko" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+</svg>
+
+<div id="app">
+<main id="viewport">
+<div id="stage" aria-roledescription="presentación">
+
+<!-- ===================== 1 · PORTADA ===================== -->
+<section class="slide dark cover" id="cover" data-speaker="ale" data-title="Portada" data-ch="0" data-intro>
+  <div class="ctext">
+    <div class="kick" data-a="kick">Proyecto de Estadística · Décimo año</div>
+    <h1><span class="ln"><span>Recolección</span></span><span class="ln"><span>y <em>Análisis</em></span></span></h1>
+    <p class="lead in">Cómo convertimos {{resp}} respuestas individuales en conclusiones útiles sobre un grupo.</p>
+    <div class="names in"><span><i style="background:var(--ale)"></i>Alejandro Castillo</span><span><i style="background:var(--gabriel)"></i>Gabriel Contreras</span><span><i style="background:var(--sumi)"></i>Sumi Feng</span></div>
+    <div class="meta in">Sección 10-A · Colegio Nuestra Señora de Sion · Octubre 2026</div>
+  </div>
+  <svg class="constel" id="cover-svg" viewBox="0 0 600 600" role="img" aria-label="20 personas en el centro, cada una conectada con sus 4 respuestas, agrupadas en 4 preguntas de 20 respuestas"></svg>
+  <aside class="notes">Saludamos y nos presentamos los tres. Explicamos en una frase la idea del proyecto: le hicimos 4 preguntas a 20 personas del colegio y vamos a mostrar cómo pasamos de esas respuestas sueltas a conclusiones sobre todo el grupo. Avisamos que cada 3 diapositivas habrá una pregunta para ellos, así que pongan atención.</aside>
+</section>
+
+<!-- ===================== 2 · RUTA ===================== -->
+<section class="slide" id="ruta" data-speaker="sumi" data-title="La ruta del proyecto" data-ch="0" data-steps="4" data-stepnames="Pregunta|Organización|Cálculos|Diagnóstico">
+  <div class="tb"><div class="kick in">La ruta del proyecto</div><h2 class="t in">De la pregunta al diagnóstico</h2></div>
+  <div class="route">
+    <svg class="route-line" viewBox="0 0 1120 56" preserveAspectRatio="none">
+      <path class="base" d="M60 28H1100"/>
+      <path pathLength="1" d="M60 28H284" data-s="1" data-fx="draw"/>
+      <path pathLength="1" d="M346 28H570" data-s="2" data-fx="draw"/>
+      <path pathLength="1" d="M632 28H856" data-s="3" data-fx="draw"/>
+    </svg>
+    <div class="stop" data-s="0" data-rstop="0"><div class="node">01</div><h3>Pregunta</h3><p>Consultamos a 20 personas del colegio con 4 preguntas específicas.</p><span class="tag">20 personas · 4 preguntas</span></div>
+    <div class="stop" data-s="1" data-rstop="1"><div class="node">02</div><h3>Organización</h3><p>Ordenamos los datos brutos y armamos una tabla de frecuencias por pregunta.</p><span class="tag">4 tablas</span></div>
+    <div class="stop" data-s="2" data-rstop="2"><div class="node">03</div><h3>Cálculos</h3><p>Mínimo, máximo, moda, media, Q₁, mediana y Q₃.</p><span class="tag">7 medidas por pregunta</span></div>
+    <div class="stop" data-s="3" data-rstop="3"><div class="node">04</div><h3>Diagnóstico</h3><p>Tipo de simetría y si la media representa o no al grupo.</p><span class="tag">Simetría y veredicto</span></div>
+  </div>
+  <div class="route-foot in"><span>Esta ruta aparece arriba a la izquierda en cada diapositiva y marca el capítulo activo.</span></div>
+  <aside class="notes">Esta diapositiva es el mapa de toda la presentación. Son cuatro pasos y vamos a ir en este orden: primero cómo preguntamos, luego cómo ordenamos los datos, después los cálculos y al final el diagnóstico, que es decidir qué medida describe mejor a cada grupo.</aside>
+</section>
+
+<!-- ===================== 3 · VOCABULARIO ===================== -->
+<section class="slide" id="vocab" data-speaker="ale" data-title="El vocabulario que vamos a usar" data-ch="0" data-steps="5" data-stepnames="Todos los términos|Para construir la tabla|Para describir el centro|Para dividir en partes|¿Qué medida uso?">
+  <div class="tb"><div class="kick in">Antes de empezar</div><h2 class="t in">El vocabulario que vamos a usar</h2></div>
+  <div class="vocab">
+    <div class="vgroups">
+      <div class="vg fz dim-able in" data-f="1"><div class="vg-l">Para construir la tabla</div>
+        <div class="vrow">
+          <div class="term"><span class="sym">x<sub>i</sub></span><p><b>Valor:</b> cada respuesta posible (0, 1, 2 hermanos…).</p></div>
+          <div class="term"><span class="sym">f<sub>i</sub></span><p><b>Frecuencia:</b> contar cuántas personas dijeron lo mismo.</p></div>
+          <div class="term"><span class="sym">F<sub>i</sub></span><p><b>Acumulada:</b> la suma de frecuencias hasta ese valor.</p></div>
+          <div class="term"><span class="sym" style="font-size:28px">x<sub>i</sub>·f<sub>i</sub></span><p><b>Valor × frecuencia:</b> sirve para sacar la media.</p></div>
+        </div></div>
+      <div class="vg fz dim-able in" data-f="2"><div class="vg-l">Para describir el centro</div>
+        <div class="vrow">
+          <div class="term"><span class="sym">Mo</span><p><b>Moda, el ganador:</b> el valor que más se repite.</p></div>
+          <div class="term"><span class="sym">x̄</span><p><b>Media, el promedio:</b> sumamos todo y repartimos entre 20.</p></div>
+          <div class="term"><span class="sym">Me</span><p><b>Mediana, el centro:</b> en una fila ordenada, el que queda en medio.</p></div>
+        </div></div>
+      <div class="vg fz dim-able in" data-f="3"><div class="vg-l">Para dividir en partes</div>
+        <div class="vrow">
+          <div class="term"><span class="sym" style="font-size:28px">Q<sub>1</sub> Q<sub>3</sub></span><p><b>Cuartiles:</b> cortan los datos ordenados en 4 partes iguales.</p></div>
+        </div></div>
+    </div>
+    <div class="which" data-s="4">
+      <h3>¿Qué medida uso?</h3>
+      <div class="w">Datos parejos, sin extremos<b>→ Media</b></div>
+      <div class="w">Hay un valor muy diferente<b>→ Mediana</b></div>
+      <div class="w">Categorías (Sí / No)<b>→ Moda</b></div>
+      <div class="w">Dividir en 4 partes<b>→ Cuartiles</b></div>
+      <div class="w" style="font-size:14px">Son pistas, no reglas: siempre miramos también cómo se reparten los datos.</div>
+    </div>
+  </div>
+  <aside class="notes">Leemos cada término con la explicación sencilla. Ejemplo para frecuencia: si 5 personas tienen 2 hermanos, la frecuencia de "2" es 5. El cuadro oscuro resume las pistas de toda la presentación: media si los datos son parejos, mediana si hay alguien muy diferente al resto, moda si la respuesta es Sí o No. Son pistas: siempre las revisamos mirando cómo se reparten los datos.</aside>
+</section>
+
+<!-- ===================== Q1 ===================== -->
+<section class="slide dark quiz" id="q1" data-speaker="ale" data-title="Pregunta 1 al público" data-correct="1" data-ch="0">
+  <div class="qtop in"><div class="qlabel">Pausa activa · Pregunta 1 de 6</div><div class="timer"></div></div>
+  <h2 class="qt in">Si 5 personas tienen 2 hermanos, ¿cuál es la frecuencia del valor 2?</h2>
+  <div class="opts in">
+    <button class="opt"><kbd>A</kbd><span>2</span><span class="om"></span></button>
+    <button class="opt"><kbd>B</kbd><span>5</span><span class="om"></span></button>
+    <button class="opt"><kbd>C</kbd><span>7</span><span class="om"></span></button>
+    <button class="opt"><kbd>D</kbd><span>10</span><span class="om"></span></button>
+  </div>
+  <div class="qfoot in"><div class="fb" role="status" aria-live="polite"></div><div class="hint">Levanten la mano por la opción que creen correcta. Después tocamos la respuesta.</div></div>
+  <aside class="notes">Leemos la pregunta, damos unos 20 segundos y pedimos que levanten la mano por cada opción. Luego tocamos la opción que más eligieron para ver si acertaron. La siguiente diapositiva explica la respuesta.</aside>
+</section>
+<section class="slide ans" id="a1" data-speaker="ale" data-title="Respuesta 1" data-ch="0">
+  <span class="badge in"><svg><use href="#i-ok"/></svg>Respuesta 1</span>
+  <div class="arow">
+    <div style="flex:0 0 380px"><div class="bigans" data-flip><span class="mx">f<sub>i</sub></span> = 5</div></div>
+    <div class="acol">
+      <h2 class="t in" style="font-size:42px">El 2 es el valor. El 5 es cuántas veces aparece.</h2>
+      <p class="lead in">Es fácil confundirlos. El valor (xᵢ) es la respuesta que dio la persona; la frecuencia (fᵢ) es cuántas personas dieron esa misma respuesta.</p>
+      <div class="panel calc in">xᵢ = 2 hermanos &nbsp;→&nbsp; fᵢ = 5 personas</div>
+    </div>
+  </div>
+  <aside class="notes">Explicamos la diferencia: el valor es lo que respondieron (2 hermanos) y la frecuencia es cuántas personas respondieron eso (5). Esto lo vamos a usar en todas las tablas que vienen.</aside>
+</section>
+
+<!-- ===================== 4 · CUATRO PREGUNTAS ===================== -->
+<section class="slide" id="preguntas" data-speaker="sumi" data-title="Cuatro preguntas, veinte respuestas" data-ch="1" data-steps="3" data-stepnames="20 personas y 4 preguntas|Cada persona responde las 4|80 respuestas en total">
+  <div class="mxhead">
+    <div class="tb"><div class="kick in">Las preguntas de la encuesta</div><h2 class="t in">Cuatro preguntas, veinte respuestas</h2></div>
+    <div class="eqn" data-s="2"><small>Respuestas en total</small>{{n}} × 4 = {{resp}}</div>
+  </div>
+  <div class="matrix" id="matrix"></div>
+  <div class="mxfoot in"><span><b>20 personas consultadas</b> · 4 preguntas a cada una = {{resp}} respuestas en total</span><span>Cada columna es una persona (#1 a #20, como en la tabla de datos).</span></div>
+  <aside class="notes">Tres preguntas son numéricas, porque la respuesta es un número que se puede contar. La cuarta es categórica: la respuesta es Sí o No, una cualidad y no una cantidad. Esa diferencia importa al final, porque con Sí/No el promedio no es una respuesta posible: se lee como la proporción de personas que dijo Sí.</aside>
+</section>
+
+<!-- ===================== 5 · DATOS BRUTOS ===================== -->
+<section class="slide" id="brutos" data-speaker="ale" data-title="Los datos brutos" data-ch="1">
+  <div class="mxhead">
+    <div class="tb"><div class="kick in">Tal como llegaron</div><h2 class="t in">Los datos brutos: así llegaron las respuestas</h2></div>
+  </div>
+  <div class="colbtns in nonav"><span>Resaltar:</span>
+    <button class="cb" data-hl="herm"><i class="c-herm"></i>Hermanos</button>
+    <button class="cb" data-hl="horas"><i class="c-horas"></i>Horas</button>
+    <button class="cb" data-hl="casa"><i class="c-casa"></i>Casa</button>
+    <button class="cb" data-hl="dep"><i class="c-dep"></i>Pregunta difícil</button>
+  </div>
+  <div class="rawwrap in"><table class="raw" id="raw1"></table><table class="raw" id="raw2"></table></div>
+  <p class="fine in">Horas = horas semanales en redes · Casa = personas que viven en la casa · ¿Respondió? = si respondió la pregunta difícil de su área</p>
+  <aside class="notes">Así se ven los datos sin ordenar. Cada fila es una persona: profesores, compañeros y otras personas del colegio. Con la tabla así no se puede concluir nada a simple vista; por eso el siguiente paso es ordenarlos y contarlos.</aside>
+</section>
+
+<!-- ===================== 6 · HERMANOS ===================== -->
+<section class="slide fq" id="f-herm" data-var="herm" data-speaker="gabriel" data-title="Tabla de frecuencias: hermanos" data-ch="2" data-steps="7">
+  <div class="tb"><div class="kick in">Tabla de frecuencias</div><h2 class="t in">Pregunta 1 · Hermanos</h2></div>
+  <div class="stepper in"></div>
+  <div class="fqbody"><div class="fq-stage"></div>
+    <div class="fq-side"><div class="panel" style="padding:8px 14px" data-s="4"><table class="ft"></table></div>
+      <div class="callout" data-s="6"><b>Moda = {{herm.mo}}:</b> {{herm.maxF}} de las {{n}} personas tienen {{herm.mo}} hermanos. Media = {{herm.sum}} ÷ {{n}} = <b>{{herm.mean}}</b></div></div></div>
+  <aside class="notes">Primero ordenamos de menor a mayor. Contamos cuántas veces aparece cada valor: eso es fᵢ. Fᵢ va sumando: 2, luego 2+3=5, luego 5+5=10, y así hasta 20, que confirma que no se nos perdió nadie. La última columna, xᵢ por fᵢ, suma 45; dividido entre 20 da la media de 2,25. La barra más alta es la moda: 3 hermanos.</aside>
+</section>
+
+<!-- ===================== Q2 ===================== -->
+<section class="slide dark quiz" id="q2" data-speaker="sumi" data-title="Pregunta 2 al público" data-correct="1" data-ch="2">
+  <div class="qtop in"><div class="qlabel">Pausa activa · Pregunta 2 de 6</div><div class="timer"></div></div>
+  <h2 class="qt in">Según la tabla de hermanos, ¿cuántas personas tienen 2 hermanos o menos?</h2>
+  <div class="opts in">
+    <button class="opt"><kbd>A</kbd><span>5 personas</span><span class="om"></span></button>
+    <button class="opt"><kbd>B</kbd><span>10 personas</span><span class="om"></span></button>
+    <button class="opt"><kbd>C</kbd><span>15 personas</span><span class="om"></span></button>
+    <button class="opt"><kbd>D</kbd><span>2 personas</span><span class="om"></span></button>
+  </div>
+  <div class="qfoot in"><div class="fb" role="status" aria-live="polite"></div><div class="hint">Pista: hay una columna de la tabla que ya hace esa suma.</div></div>
+  <aside class="notes">Esta pregunta revisa si entendieron la frecuencia acumulada. Damos tiempo, contamos manos y tocamos la respuesta más votada.</aside>
+</section>
+<section class="slide ans" id="a2" data-speaker="sumi" data-title="Respuesta 2" data-ch="2">
+  <span class="badge in"><svg><use href="#i-ok"/></svg>Respuesta 2</span>
+  <div class="arow">
+    <div style="flex:0 0 330px;display:flex;flex-direction:column;gap:4px"><div class="bigans" data-flip>10</div><span class="lead in">personas</span></div>
+    <div class="acol">
+      <h2 class="t in" style="font-size:42px">La frecuencia acumulada (Fᵢ) lo dice directo</h2>
+      <div class="panel calc in">0 hermanos → 2<br>1 hermano &nbsp;→ 3<br>2 hermanos → 5<br><b>2 + 3 + 5 = 10 = Fᵢ del valor 2</b></div>
+      <p class="lead in">Si escogieron 5, leyeron la frecuencia normal (fᵢ), que solo cuenta a quienes tienen exactamente 2.</p>
+    </div>
+  </div>
+  <aside class="notes">Explicamos que "2 o menos" incluye 0, 1 y 2 hermanos. Sumando sus frecuencias da 10, que es justo el número de la columna Fᵢ en la fila del 2. La mitad del grupo tiene 2 hermanos o menos.</aside>
+</section>
+
+<!-- ===================== 7 · HORAS ===================== -->
+<section class="slide fq" id="f-horas" data-var="horas" data-speaker="gabriel" data-title="Tabla de frecuencias: horas en redes" data-ch="2" data-steps="7">
+  <div class="tb"><div class="kick in">Tabla de frecuencias</div><h2 class="t in">Pregunta 2 · Horas en redes sociales</h2></div>
+  <div class="stepper in"></div>
+  <div class="fqbody"><div class="fq-stage"></div>
+    <div class="fq-side"><div class="panel" style="padding:8px 14px" data-s="4"><table class="ft"></table></div>
+      <div class="callout" data-s="6"><b>Moda = {{horas.mo}} h</b>, pero los datos se reparten de {{horas.min}} a {{horas.max}}. Media = {{horas.sum}} ÷ {{n}} = <b>{{horas.mean}} h</b></div></div></div>
+  <aside class="notes">Mismo procedimiento. Aquí las respuestas están mucho más repartidas: hay gente con 2 horas y gente con 10, y ninguna barra domina. La moda es 6 horas, pero solo por 4 personas. La suma de xᵢ por fᵢ es 115 y la media queda en 5,75 horas por semana.</aside>
+</section>
+
+<!-- ===================== 8 · CASA ===================== -->
+<section class="slide fq" id="f-casa" data-var="casa" data-speaker="gabriel" data-title="Tabla de frecuencias: personas en casa" data-ch="2" data-steps="7">
+  <div class="tb"><div class="kick in">Tabla de frecuencias</div><h2 class="t in">Pregunta 3 · Personas que viven en la casa</h2></div>
+  <div class="stepper in"></div>
+  <div class="fqbody"><div class="fq-stage"></div>
+    <div class="fq-side"><div class="panel" style="padding:8px 14px" data-s="4"><table class="ft"></table></div>
+      <div class="callout" data-s="6"><b>Moda = {{casa.mo}} personas.</b> El {{casa.max}} queda aislado a la derecha. Media = {{casa.sum}} ÷ {{n}} = <b>{{casa.mean}}</b></div></div></div>
+  <aside class="notes">Fíjense en el gráfico: casi todos están entre 1 y 6 personas, y de pronto aparece un 10 solo, lejísimos. Ese dato es de Sor Adriana (registro #8). Lo dejamos marcado en rojo porque más adelante vamos a demostrar con números que es un valor atípico. La media da 3,45.</aside>
+</section>
+
+<!-- ===================== 9 · DEPORTE ===================== -->
+<section class="slide" id="deporte" data-speaker="sumi" data-title="Pregunta 4: Sí / No" data-ch="2" data-steps="4" data-stepnames="Las 20 respuestas|Se agrupan en Sí y No|Cada persona es 1/20 del círculo|11 ÷ 20 = 55 %">
+  <div class="tb"><div class="kick in">Tabla de frecuencias</div><h2 class="t in" style="font-size:42px">Pregunta 4 · Una pregunta difícil de su área: ¿la respondió?</h2></div>
+  <div class="depbody">
+    <div class="depleft">
+      <div class="panel in" style="padding:8px 16px"><table class="ft" id="depft" style="--vt:var(--dep-t)"></table></div>
+      <div class="panel in" style="padding:18px 20px;border-left:5px solid var(--dep)"><b style="font:800 22px var(--f-d);font-stretch:110%;color:var(--dep-ink)">¿Por qué 1 y 0?</b><p style="margin:6px 0 0;font-size:18px;line-height:1.5;color:var(--text-2)">Es una pregunta <b style="color:var(--text)">cualitativa</b>. La codificamos Sí = 1 y No = 0 para poder ponerla en tabla. Así la media se vuelve la proporción de personas que dijo Sí.</p></div>
+    </div>
+    <div class="dep-stage" id="dep-stage"></div>
+  </div>
+  <aside class="notes">Esta es la única pregunta cualitativa. Para poder trabajarla como las demás le pusimos 1 al Sí y 0 al No. Así, sumar la columna da cuántos dijeron Sí: 11 de 20, o sea 55 %. El gráfico circular muestra que el grupo está casi dividido a la mitad, con un poco más de gente que sí respondió la pregunta difícil de su área.</aside>
+</section>
+
+<!-- ===================== Q3 ===================== -->
+<section class="slide dark quiz" id="q3" data-speaker="ale" data-title="Pregunta 3 al público" data-correct="1" data-ch="2">
+  <div class="qtop in"><div class="qlabel">Pausa activa · Pregunta 3 de 6</div><div class="timer"></div></div>
+  <h2 class="qt in" style="font-size:40px;max-width:28ch">En una empresa, 9 empleados ganan $1 000 y el dueño gana $50 000. ¿Qué medida describe mejor el sueldo típico?</h2>
+  <div class="opts in">
+    <button class="opt"><kbd>A</kbd><span>La media</span><span class="om"></span></button>
+    <button class="opt"><kbd>B</kbd><span>La mediana</span><span class="om"></span></button>
+  </div>
+  <div class="qfoot in"><div class="fb" role="status" aria-live="polite"></div><div class="hint">Piensen en el truco de la diapositiva del vocabulario.</div></div>
+  <aside class="notes">Pedimos manos para media y para mediana. Esta pregunta conecta con lo que viene: qué pasa cuando hay un valor muy diferente al resto.</aside>
+</section>
+<section class="slide ans" id="a3" data-speaker="ale" data-title="Respuesta 3" data-ch="2">
+  <span class="badge in" data-flip><svg><use href="#i-ok"/></svg>Respuesta 3 · La mediana</span>
+  <h2 class="t in" style="font-size:44px">Un solo sueldo enorme jala la media hacia arriba</h2>
+  <div class="two">
+    <div class="panel card in"><span class="vt v-neg" style="align-self:flex-start">Media</span><div class="mono" style="font-size:23px">(9 × 1 000 + 50 000) ÷ 10</div><div class="big" style="color:var(--bad)">${{salary.mean|k}}</div><p>Está bien calculada: reparte el total entre las 10 personas. Pero 9 de las 10 ganan 1 000 y un solo sueldo la sube; no describe el sueldo típico.</p></div>
+    <div class="panel card in"><span class="vt v-sim" style="align-self:flex-start">Mediana</span><div class="mono" style="font-size:23px">1 000 · 1 000 · … · 1 000 · 50 000</div><div class="big" style="color:var(--ok)">${{salary.me|k}}</div><p>Es lo que gana la persona del centro, y lo que gana casi todo el grupo.</p></div>
+  </div>
+  <aside class="notes">La media da 5 900 dólares: está bien calculada, pero 9 de las 10 personas ganan 1 000 y el sueldo del dueño la sube. La mediana se fija en el dato del centro y da 1 000, que describe el sueldo típico. Algo parecido pasa con el 10 en personas por casa.</aside>
+</section>
+
+<!-- ===================== 10 · POSICIONES ===================== -->
+<section class="slide" id="posiciones" data-speaker="gabriel" data-title="Posición de los cuartiles" data-ch="3" data-steps="5" data-stepnames="Los 20 datos ordenados|Posición de Q₁|Posición de la mediana|Posición de Q₃|Valor de cada cuartil">
+  <div class="tb"><div class="kick in">Cuartiles · Hermanos ordenados</div><h2 class="t in">¿Dónde caen los cuartiles?</h2>
+    <p class="lead in" style="font-size:19px;margin-top:4px">Con los datos ordenados, primero buscamos la <b style="color:var(--text)">posición</b> de cada cuartil. Con n = {{n}}:</p></div>
+  <div class="qs" id="qs"></div>
+  <div class="qform">
+    <div class="panel qf" data-s="1"><span class="ball">Q<sub>1</sub></span><div><small>(n + 1) ÷ 4</small><strong>21 ÷ 4 = {{herm.Q1.pos}}</strong></div></div>
+    <div class="panel qf" data-s="2"><span class="ball">Me</span><div><small>(n + 1) ÷ 2</small><strong>21 ÷ 2 = {{herm.Q2.pos}}</strong></div></div>
+    <div class="panel qf" data-s="3"><span class="ball">Q<sub>3</sub></span><div><small>3(n + 1) ÷ 4</small><strong>63 ÷ 4 = {{herm.Q3.pos}}</strong></div></div>
+  </div>
+  <p class="fine" data-s="4" style="font-size:17px;line-height:1.5">La posición 5,25 está entre el dato 5 y el 6. La 10,5 entre el 10 y el 11. La 15,75 entre el 15 y el 16. Por eso necesitamos una fórmula para el decimal.</p>
+  <aside class="notes">Importante: la fórmula no da el cuartil, da en qué lugar de la fila está. Con 20 datos, Q₁ está en el lugar 5,25, la mediana en el 10,5 y Q₃ en el 15,75. Como esos lugares tienen decimales, el cuartil cae entre dos datos, y en la siguiente diapositiva vemos cómo calcularlo.</aside>
+</section>
+
+<!-- ===================== 11 · INTERPOLACIÓN ===================== -->
+<section class="slide dark" id="interp" data-speaker="gabriel" data-title="Fórmula del decimal" data-ch="3" data-steps="6" data-stepnames="La fórmula|Identificar a y b|La distancia b − a|La fracción d|El desplazamiento desde a|El resultado">
+  <div class="tb"><div class="kick in">Interpolación</div><h2 class="t in">Si la posición tiene decimal…</h2></div>
+  <div style="display:flex;align-items:flex-end;gap:36px" class="in">
+    <div class="formula" id="formula"><span data-t="q">Q</span><span>=</span><span data-t="a">a</span><span data-t="p">+</span><span data-t="d">d</span><span data-t="ba">(b − a)</span></div>
+    <p class="flegend" style="margin:0 0 8px"><b>a</b> y <b>b</b>: los datos entre los que cae la posición · <b>d</b>: la parte decimal</p>
+  </div>
+  <svg class="isvg" id="isvg" viewBox="0 0 1120 282"></svg>
+  <div class="minis in">
+    <div class="mini lead1"><small>Q₁ de hermanos (posición 5,25)</small><b>1 + 0,25 · (2 − 1) = <strong>{{herm.q1}}</strong></b></div>
+    <div class="mini"><small>Me hermanos</small><b>(2 + 3) ÷ 2 = {{herm.me}}</b></div>
+    <div class="mini"><small>Q₁ horas</small><b>3 + 0,25·1 = {{horas.q1}}</b></div>
+    <div class="mini"><small>Q₃ hermanos</small><b>3 + 0,75·0 = {{herm.q3}}</b></div>
+  </div>
+  <aside class="notes">El dato 5 de hermanos es 1 y el dato 6 es 2. La posición 5,25 está a un cuarto del camino entre ellos. Entonces: empiezo en 1, la distancia entre los dos es 1, y avanzo 0,25 de esa distancia: 1,25. Para la mediana, 10,5 está justo a la mitad entre 2 y 3, así que es 2,5. Cuando a y b son iguales, como en Q₃ de hermanos, el resultado es ese mismo número.</aside>
+</section>
+
+<!-- ===================== 12 · TABLA DE MEDIDAS ===================== -->
+<section class="slide" id="medidas" data-speaker="gabriel" data-title="Todas las medidas en una tabla" data-ch="3" data-steps="2" data-stepnames="Las siete medidas|Comparar media y mediana">
+  <div class="tb"><div class="kick in">Resumen de cálculos</div><h2 class="t in">Las siete medidas de cada pregunta</h2></div>
+  <div class="recap in"><span>Totales de cada tabla de frecuencias:</span>
+    <span class="rc" data-k="herm"><i class="c-herm"></i>Σxᵢ·fᵢ = {{herm.sum}} · n = {{herm.n}}</span><span class="rc" data-k="horas"><i class="c-horas"></i>Σxᵢ·fᵢ = {{horas.sum}} · n = {{horas.n}}</span>
+    <span class="rc" data-k="casa"><i class="c-casa"></i>Σxᵢ·fᵢ = {{casa.sum}} · n = {{casa.n}}</span><span class="rc" data-k="dep"><i class="c-dep"></i>Σxᵢ·fᵢ = {{dep.sum}} · n = {{dep.n}}</span></div>
+  <div class="panel in" style="padding:10px 20px"><table class="mtab" id="mtab"></table></div>
+  <p class="fine in" style="font-size:15.5px">Toca el nombre de una pregunta para enfocar su columna. La mediana también se llama Q₂, el segundo cuartil. En la pregunta difícil, Sí = 1 y No = 0, y la media 0,55 es la proporción de Sí.</p>
+  <aside class="notes">Aquí está todo junto. Las dos filas resaltadas son las que vamos a comparar en el diagnóstico: media contra mediana. Fíjense que en horas casi coinciden (5,75 y 6), pero en personas en casa la media es más alta que la mediana (3,45 contra 3).</aside>
+</section>
+
+<!-- ===================== Q4 ===================== -->
+<section class="slide dark quiz" id="q4" data-speaker="gabriel" data-title="Pregunta 4 al público" data-correct="1" data-ch="3">
+  <div class="qtop in"><div class="qlabel">Pausa activa · Pregunta 4 de 6</div><div class="timer"></div></div>
+  <h2 class="qt in">Q₁ cae en la posición 5,25. El dato 5 es 4 y el dato 6 es 8. ¿Cuánto vale Q₁?</h2>
+  <div class="opts in">
+    <button class="opt"><kbd>A</kbd><span>4,25</span><span class="om"></span></button>
+    <button class="opt"><kbd>B</kbd><span>5</span><span class="om"></span></button>
+    <button class="opt"><kbd>C</kbd><span>6</span><span class="om"></span></button>
+    <button class="opt"><kbd>D</kbd><span>5,25</span><span class="om"></span></button>
+  </div>
+  <div class="qfoot in"><div class="fb" role="status" aria-live="polite"></div><div class="hint">Usen Q = a + d(b − a)</div></div>
+  <aside class="notes">Esta es la más difícil. Dejamos que la calculen mentalmente o en el cuaderno. Las trampas son 4,25 (sumar el decimal directo) y 5,25 (confundir la posición con el valor).</aside>
+</section>
+<section class="slide ans" id="a4" data-speaker="gabriel" data-title="Respuesta 4" data-ch="3">
+  <span class="badge in"><svg><use href="#i-ok"/></svg>Respuesta 4</span>
+  <div class="arow">
+    <div style="flex:0 0 360px"><div class="bigans" data-flip>Q<sub style="font-size:.5em">1</sub> = {{q4.value}}</div></div>
+    <div class="acol">
+      <div class="panel calc in" style="font-size:24px">a = {{q4.a}} &nbsp; b = {{q4.b}} &nbsp; d = {{q4.d}}<br>Q₁ = 4 + 0,25 · (8 − 4)<br>Q₁ = 4 + 0,25 · 4<br><b>Q₁ = 4 + 1 = {{q4.value}}</b></div>
+      <p class="lead in">Si respondieron 4,25 sumaron el decimal sin multiplicarlo por la distancia. Si respondieron 5,25 confundieron la posición con el valor.</p>
+    </div>
+  </div>
+  <aside class="notes">Resolvemos paso a paso en voz alta. La distancia entre 4 y 8 es 4; un cuarto de esa distancia es 1; entonces Q₁ = 5.</aside>
+</section>
+
+<!-- ===================== 13 · DIAGRAMA DE CAJA ===================== -->
+<section class="slide" id="box" data-speaker="gabriel" data-title="Diagrama de caja" data-ch="3" data-steps="6" data-stepnames="La escala de cada variable|Bigotes|Caja (Q₁ a Q₃)|Mediana|Media|Valor atípico">
+  <div class="tb"><div class="kick in">Las medidas en un dibujo</div><h2 class="t in">Así se ven los datos: diagrama de caja</h2></div>
+  <svg class="bsvg" id="bsvg" viewBox="0 0 1120 392"></svg>
+  <div class="bnote" data-s="5">En personas en casa el bigote llega hasta <b>{{casa.wHi}}</b>: es el dato más alto que no pasa el límite de <b>{{casa.hi}}</b>. El máximo observado, <b>{{casa.max}}</b>, se dibuja aparte como punto: es un valor atípico.</div>
+  <aside class="notes">El diagrama de caja resume las siete medidas en un dibujo. La caja va de Q₁ a Q₃ y guarda al 50 % del centro. La raya gruesa es la mediana y el rombo es la media. Los bigotes llegan al mínimo y al máximo, salvo cuando hay un valor atípico: en personas en casa el bigote llega hasta 6 y el 10 se dibuja aparte. En horas, la caja es ancha (los datos están repartidos) y la media casi toca la mediana. En personas en casa, el 10 queda como un punto aislado: un valor atípico.</aside>
+</section>
+
+<!-- ===================== 14 · EL CASO DEL 10 ===================== -->
+<section class="slide" id="atipico" data-speaker="gabriel" data-title="El caso del 10: valor atípico" data-ch="4" data-steps="6" data-stepnames="Los 20 datos|Q₁ = 2|Q₃ = 4 y RIC|Límite superior = 7|10 > 7|Efecto en la media">
+  <div class="tb"><div class="kick in">Personas en casa</div><h2 class="t in">El caso del 10: ¿cómo probamos que es atípico?</h2></div>
+  <div class="obody">
+    <svg class="osvg" id="osvg" viewBox="0 0 690 430"></svg>
+    <div class="ocards">
+      <div class="oc" data-s="2"><span class="n">1</span><div><small>Rango intercuartílico</small><strong>RIC = {{casa.q3}} − {{casa.q1}} = {{casa.iqr}}</strong></div></div>
+      <div class="oc" data-s="3"><span class="n">2</span><div><small>Límite superior</small><strong>Q₃ + 1,5·RIC = {{casa.q3}} + 3 = {{casa.hi}}</strong></div></div>
+      <div class="oc hot" data-s="4"><span class="n">3</span><div><small>Comparación</small><strong>{{casa.max}} &gt; {{casa.hi}} → atípico</strong></div></div>
+      <div class="oeff" data-s="5"><span class="h">Efecto del 10 · comparación ilustrativa</span>
+        <span>Con el 10 (n = {{casa.n}})</span><div>x̄ = {{casa.sum}} ÷ {{casa.n}} = {{casa.mean}} · Me = {{casa.me}}</div>
+        <span>Sin el 10 (n = {{casaSin.n}})</span><div>x̄ = {{casaSin.sum}} ÷ {{casaSin.n}} ≈ {{casaSin.mean}} · Me = {{casaSin.me}}</div>
+        <div class="nb">El 10 sigue siendo parte del estudio. Quitarlo cambia la muestra de 20 a 19 personas; solo lo hacemos para ver cuánto mueve la media y la mediana.</div></div>
+    </div>
+  </div>
+  <aside class="notes">No basta con decir "se ve lejos"; hay una regla. El rango intercuartílico es Q₃ menos Q₁: 4 menos 2, da 2. El límite superior es Q₃ más 1,5 veces el RIC: 4 más 3, da 7. Cualquier dato mayor a 7 es atípico, y 10 es mayor que 7. Ese único dato sube la media de 3,11 (sin el 10, con 19 personas) a 3,45 (con el 10, las 20 personas); la mediana se queda en 3. Aclaramos que el 10 sigue en el estudio: quitarlo es solo una comparación.</aside>
+</section>
+
+<!-- ===================== 15 · VEREDICTO ===================== -->
+<section class="slide" id="veredicto" data-speaker="sumi" data-title="Veredicto por pregunta" data-ch="4">
+  <div class="tb"><div class="kick in">Diagnóstico</div><h2 class="t in">Veredicto: ¿la media representa al grupo?</h2></div>
+  <div class="rules in"><span class="vt v-sim">Pista: x̄ ≈ Me → posible simetría</span><span class="vt v-pos">x̄ &gt; Me → posible cola a la derecha</span><span class="vt v-neg">x̄ &lt; Me → posible cola a la izquierda</span></div>
+  <p class="rules-note in">Comparar media y mediana es una pista, no una prueba. La confirmamos con la distribución: cuánto se abre la caja hacia cada lado (Me − Q₁ frente a Q₃ − Me) y si hay valores atípicos.</p>
+  <div class="panel in" style="padding:6px 18px"><table class="vtab" id="vtab">
+    <thead><tr><th>Pregunta</th><th>Pista: x̄ · Me · Mo</th><th>Lo que muestra la distribución</th><th>Diagrama</th><th>Forma</th><th>Mejor medida del centro</th></tr></thead><tbody></tbody></table></div>
+  <p class="fine in" style="font-size:14px">Diagrama: ◆ media · | mediana · caja de Q₁ a Q₃ · ● atípico. Resultados de las 20 personas encuestadas.</p>
+  <aside class="notes">Comparar media y mediana es una pista, no una prueba: la confirmamos mirando la distribución. En hermanos la caja se abre más hacia abajo (1,25 contra 0,5) y no hay atípicos: ligera asimetría negativa. En horas la media y la mediana casi coinciden y no hay atípicos: casi simétrica. En personas en casa la caja es pareja (1 y 1), pero el 10 es atípico y alarga la cola derecha: asimetría positiva. La pregunta difícil es categórica: la media es la proporción de Sí (55 %) y la moda es Sí.</aside>
+</section>
+
+<!-- ===================== Q5 ===================== -->
+<section class="slide dark quiz" id="q5" data-speaker="gabriel" data-title="Pregunta 5 al público" data-correct="1" data-ch="4">
+  <div class="qtop in"><div class="qlabel">Detective de simetría · Pregunta 5 de 6</div><div class="timer"></div></div>
+  <h2 class="qt in" style="font-size:38px;max-width:30ch">Edades de un equipo: <span class="mono" style="color:var(--horas-l);font-size:32px;font-weight:500">18, 19, 19, 20, 20, 21, 21, 22, 22, 45</span>. ¿Qué forma tienen los datos?</h2>
+  <div class="opts three in">
+    <button class="opt"><kbd>A</kbd><span>Simétrica</span><span class="om"></span></button>
+    <button class="opt"><kbd>B</kbd><span>Asimetría positiva</span><span class="om"></span></button>
+    <button class="opt"><kbd>C</kbd><span>Asimetría negativa</span><span class="om"></span></button>
+  </div>
+  <div class="qfoot in"><div class="fb" role="status" aria-live="polite"></div><div class="hint">¿Dónde queda la mediana? ¿La media será mayor o menor que ella?</div></div>
+  <aside class="notes">Les pedimos que piensen dónde está la mediana y si hay algún dato raro. Contamos manos por las tres opciones.</aside>
+</section>
+<section class="slide ans" id="a5" data-speaker="gabriel" data-title="Respuesta 5" data-ch="4">
+  <span class="badge in" data-flip><svg><use href="#i-ok"/></svg>Respuesta 5 · Asimetría positiva</span>
+  <h2 class="t in" style="font-size:44px;white-space:normal;color:var(--text)">El jugador de 45 años jala la media hacia la derecha</h2>
+  <div class="three">
+    <div class="panel card in"><span class="k">Mediana (posición {{ages.Q2.pos}})</span><div class="mono" style="font-size:21px">(20 + 21) ÷ 2</div><div class="big">{{ages.me}}</div></div>
+    <div class="panel card in"><span class="k">Media</span><div class="mono" style="font-size:21px">{{ages.sum}} ÷ {{ages.n}}</div><div class="big" style="color:var(--bad)">{{ages.mean}}</div></div>
+    <div class="panel card in"><span class="k">¿El 45 es atípico?</span><div class="mono" style="font-size:18px;line-height:1.5">Q₁ = {{ages.q1}} · Q₃ = {{ages.q3}} · RIC = {{ages.iqr}}<br>Límite = {{ages.q3}} + 4,5 = {{ages.hi}}</div><div class="big" style="font-size:32px">45 &gt; {{ages.hi}} → sí</div></div>
+  </div>
+  <p class="lead in" style="max-width:none">x̄ ({{ages.mean}}) &gt; Me ({{ages.me}}) es la pista. La distribución la confirma: nueve edades entre 18 y 22 y una sola, 45, muy a la derecha y atípica. Es asimetría positiva, y para describir la edad típica del equipo la mediana es más representativa.</p>
+  <aside class="notes">La mediana es 20,5 y la media 22,7. Que la media sea mayor es la pista; lo confirmamos viendo los datos: nueve edades juntas y un 45 muy a la derecha. Con la regla del RIC comprobamos que el 45 es atípico, igual que el 10 en nuestras casas. Para la edad típica usamos la mediana.</aside>
+</section>
+
+<!-- ===================== 16 · POR QUÉ ===================== -->
+<section class="slide" id="porque" data-speaker="ale" data-title="Por qué lo decidimos así" data-ch="4">
+  <div class="tb"><div class="kick in">Diagnóstico en palabras</div><h2 class="t in">Por qué lo decidimos así</h2></div>
+  <div class="why">
+    <div class="wy in"><span class="vglyph c-herm"><svg class="ic"><use href="#i-herm"/></svg></span><h4>Hermanos <span class="vt v-neg">Preferimos la mediana</span></h4><p>La media ({{herm.mean}}) queda debajo de la mediana ({{herm.me}}) porque {{herm.low01}} de las 20 personas tienen 0 o 1 hermano. No son atípicos (el límite inferior es {{herm.lo}}): es la forma de la distribución, que se abre más hacia valores bajos. Para el valor típico usamos la mediana.</p></div>
+    <div class="wy in"><span class="vglyph c-horas"><svg class="ic"><use href="#i-horas"/></svg></span><h4>Horas en redes <span class="vt v-sim">La media resume bien</span></h4><p>Media, mediana y moda casi coinciden ({{horas.mean}}; {{horas.me}} y {{horas.mo}}), no hay atípicos y la caja se abre parecido hacia los dos lados ({{horas.dLo}} y {{horas.dHi}}). En este grupo la media describe bien el centro.</p></div>
+    <div class="wy in"><span class="vglyph c-casa casa"><svg class="ic"><use href="#i-casa"/></svg></span><h4>Personas en casa <span class="vt v-neg">Preferimos la mediana</span></h4><p>El {{casa.max}} es atípico (pasa el límite de {{casa.hi}}). Con él la media es {{casa.mean}}; sin él sería ≈ {{casaSin.mean}}. La mediana se queda en {{casa.me}} en los dos casos: es menos sensible a ese dato.</p></div>
+    <div class="wy in"><span class="vglyph c-dep"><svg class="ic"><use href="#i-dep"/></svg></span><h4>Pregunta difícil <span class="vt v-cat">Proporción y moda</span></h4><p>{{dep.mean}} no es una respuesta posible, pero dice algo exacto: el {{dep.pct|pct}} dijo Sí ({{dep.sum}} de {{n}}). La moda es otra cosa: la categoría más frecuente, que es Sí. Las dos sirven.</p></div>
+  </div>
+  <aside class="notes">Explicamos con palabras cada veredicto, sin números complicados. La idea clave: el promedio resume bien el centro cuando los datos son parejos. Si hay un valor atípico o la distribución se inclina hacia un lado, la mediana suele describir mejor el valor típico. Con Sí/No, la media es la proporción de Sí y la moda es la respuesta más frecuente.</aside>
+</section>
+
+<!-- ===================== 17 · CONCLUSIÓN ===================== -->
+<section class="slide" id="conclusion" data-speaker="sumi" data-title="Lo que nos dicen los datos" data-ch="4">
+  <div class="tb"><div class="kick in">Conclusión · las 20 personas encuestadas</div><h2 class="t in">Lo que nos dicen los datos</h2></div>
+  <div class="stats">
+    <div class="stat c-horas in" data-mini="horas"><b>≈ 6 h</b><span>por semana en redes sociales: el valor típico</span><svg></svg><div class="src">x̄ {{horas.mean}} · Me {{horas.me}} · Mo {{horas.mo}}</div></div>
+    <div class="stat c-herm in" data-mini="herm"><b>{{herm.me}}</b><span>hermanos es la mediana; el valor más común es {{herm.mo}}</span><svg></svg><div class="src">x̄ {{herm.mean}} · Me {{herm.me}} · Mo {{herm.mo}}</div></div>
+    <div class="stat c-casa casa in" data-mini="casa"><b>3</b><span>personas en casa: el valor central y el más común</span><svg></svg><div class="src">Me {{casa.me}} · Mo {{casa.mo}} · x̄ {{casa.mean}}</div></div>
+    <div class="stat c-dep in" data-mini="dep"><b>{{dep.pct|pct}}</b><span>respondió la pregunta difícil de su área ({{dep.sum}} de {{n}})</span><svg></svg><div class="src">{{dep.sum}} ÷ {{n}} = {{dep.mean}}</div></div>
+  </div>
+  <div class="panel concl in" style="font-size:19px">En estas 20 personas, la media resumió bien el centro en <b>horas en redes</b>, donde la distribución es casi simétrica. En <b>personas en casa</b> el valor atípico 10 sube la media; en <b>hermanos</b> no hay atípicos, pero la distribución se abre hacia valores bajos. En esos dos casos usamos la <b>mediana</b>. Los resultados describen a los encuestados, no a todo el colegio.</div>
+  <aside class="notes">Resumimos con las cuatro cifras que describen a las 20 personas encuestadas: unas 6 horas a la semana en redes, una mediana de 2,5 hermanos (lo más común es 3), un valor típico de 3 personas en casa y el 55 % respondió la pregunta difícil de su área. Y la lección principal: antes de usar un promedio, hay que revisar cómo se reparten los datos. Aclaramos que esto describe a quienes respondieron, no a todo el colegio.</aside>
+</section>
+
+<!-- ===================== Q6 ===================== -->
+<section class="slide dark quiz" id="q6" data-speaker="sumi" data-title="Pregunta 6 al público" data-correct="0" data-ch="4">
+  <div class="qtop in"><div class="qlabel">Última pausa · Pregunta 6 de 6</div><div class="timer"></div></div>
+  <h2 class="qt in">Todos los estudiantes sacaron entre 80 y 95 en un examen. ¿Qué medida usarías para la nota típica?</h2>
+  <div class="opts three in">
+    <button class="opt"><kbd>A</kbd><span>La media</span><span class="om"></span></button>
+    <button class="opt"><kbd>B</kbd><span>La moda</span><span class="om"></span></button>
+    <button class="opt"><kbd>C</kbd><span>Ninguna</span><span class="om"></span></button>
+  </div>
+  <div class="qfoot in"><div class="fb" role="status" aria-live="polite"></div><div class="hint">¿Hay algún valor extremo? ¿Es una categoría?</div></div>
+  <aside class="notes">Última pregunta: repasa todo lo aprendido. Si alguien eligió moda, en la respuesta explicamos cuándo sí conviene la moda.</aside>
+</section>
+<section class="slide ans" id="a6" data-speaker="sumi" data-title="Respuesta 6" data-ch="4">
+  <span class="badge in" data-flip><svg><use href="#i-ok"/></svg>Respuesta 6 · La media</span>
+  <h2 class="t in" style="font-size:44px">Notas cercanas entre sí: la media es razonable</h2>
+  <div class="three">
+    <div class="panel card in" style="border-top:6px solid var(--ok)"><b style="font:800 25px var(--f-d);font-stretch:108%">Notas de 80 a 95 → Media</b><p>Si todas están entre 80 y 95, ningún dato puede quedar muy lejos del resto, así que la media no se desvía mucho. Ojo: el intervalo solo no prueba simetría; para eso hay que mirar cómo se reparten las notas.</p></div>
+    <div class="panel card in" style="border-top:6px solid var(--dep)"><b style="font:800 25px var(--f-d);font-stretch:108%">Color de ojos → Moda</b><p>Es una categoría. No se puede sacar el promedio de "café" y "verde"; solo el más común.</p></div>
+    <div class="panel card in" style="border-top:6px solid var(--herm)"><b style="font:800 25px var(--f-d);font-stretch:108%">Sueldos con un dueño → Mediana</b><p>Un valor atípico sube la media. La mediana se queda en el centro.</p></div>
+  </div>
+  <aside class="notes">Cerramos el repaso con tres pistas: media para datos parejos, moda para categorías, mediana cuando hay atípicos o una distribución inclinada. Con las notas, saber que están entre 80 y 95 nos dice que nadie queda lejos, pero no prueba que sean simétricas. Son los mismos casos que encontramos en nuestra encuesta.</aside>
+</section>
+
+<!-- ===================== 18 · GRACIAS ===================== -->
+<section class="slide dark cover end" id="gracias" data-speaker="ale" data-title="Cierre y preguntas" data-ch="5" data-intro>
+  <div class="ctext" style="width:600px">
+    <div class="kick in" style="color:var(--horas-l)">Gracias</div>
+    <h1><span class="ln"><span>Detrás de cada</span></span><span class="ln"><span>promedio hay</span></span><span class="ln"><span><em>veinte historias.</em></span></span></h1>
+    <p class="lead in" style="font-size:26px;color:var(--on-ink)">¿Preguntas?</p>
+    <div class="names in"><span><i style="background:var(--ale)"></i>Alejandro Castillo</span><span><i style="background:var(--gabriel)"></i>Gabriel Contreras</span><span><i style="background:var(--sumi)"></i>Sumi Feng</span></div>
+    <div class="meta in">Sección 10-A · {{n}} personas · {{resp}} respuestas</div>
+  </div>
+  <svg class="constel" id="end-svg" viewBox="0 0 600 600" role="img" aria-label="Las 80 respuestas regresan a sus 20 personas"></svg>
+  <aside class="notes">Agradecemos y abrimos espacio para preguntas. Si preguntan algo de cálculo, responde Gabriel; si es sobre la encuesta o las conclusiones, Sumi o Ale.</aside>
+</section>
+
+<div id="fly" aria-hidden="true"></div>
+<div id="wipe" aria-hidden="true" style="position:absolute;inset:0;z-index:30;background:var(--ink);transform:translateX(101%);display:flex;flex-direction:column;justify-content:center;padding:0 80px;gap:10px;pointer-events:none">
+  <div style="font:600 18px var(--f-m);color:var(--q)" id="wipe-n">02</div>
+  <div style="font:800 96px/1 var(--f-d);font-stretch:118%;letter-spacing:-.02em;color:var(--on-ink)" id="wipe-t">Organización</div>
+</div>
+</div>
+</main>
+
+<nav id="bar" aria-label="Controles de la presentación">
+  <button class="bb" id="bPrev" aria-label="Anterior (flecha izquierda)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button class="bb primary" id="bNext" aria-label="Avanzar (flecha derecha)"><span class="lbl" id="nextLbl">Siguiente</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+  <button class="bb hide-s" id="bSkip" title="Saltar a la siguiente diapositiva (Shift + →)"><span class="lbl">Saltar escena</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5l7 7-7 7M17 5v14"/></svg></button>
+  <div class="bar-mid">
+    <span class="count" id="count"><b>1</b> / 30</span>
+    <span class="stepdots" id="stepdots"></span>
+    <span class="spk hide-m" id="spk"></span>
+    <div class="prog hide-s" id="prog" title="Ir a una diapositiva"><div class="track"></div><div class="fill" id="progfill"></div></div>
+  </div>
+  <button class="bb" id="bIndex" title="Índice (I)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span class="lbl hide-m">Índice</span></button>
+  <button class="bb" id="bNotes" title="Guion (N)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4h9l3 3v13H6z"/><path d="M9 11h6M9 15h6"/></svg><span class="lbl hide-m">Guion</span></button>
+  <button class="bb hide-s" id="bAll" aria-pressed="false" title="Escenas completas en toda la presentación: cada diapositiva aparece ya construida, sin pasos (V)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="lbl hide-m" id="allLbl">Escenas completas</span></button>
+  <button class="bb hide-s" id="bMotion" aria-pressed="false" title="Cambiar movimiento (M)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 12h4l2-5 4 10 2-5h4"/></svg><span class="lbl hide-m" id="motionLbl">Movimiento</span></button>
+  <button class="bb" id="bFs" title="Pantalla completa (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+</nav>
+
+<aside id="drawer" aria-label="Panel del expositor">
+  <div class="dw">
+    <div class="dw-tabs" role="tablist">
+      <button class="dw-tab" role="tab" data-tab="notes" aria-selected="true">Guion</button>
+      <button class="dw-tab" role="tab" data-tab="rep" aria-selected="false">Reparto</button>
+      <button class="dw-tab" role="tab" data-tab="aud" aria-selected="false">Revisión</button>
+      <button class="bb dw-x" id="dwClose" aria-label="Cerrar panel" style="height:36px;min-width:36px;padding:0 10px;margin-bottom:4px">✕</button>
+    </div>
+    <div class="dw-body" id="dwBody"></div>
+  </div>
+</aside>
+
+<div id="toast" hidden role="status" aria-live="polite"></div>
+<div id="smallnote" hidden><span>Pantalla pequeña: la presentación está pensada para proyector o laptop y aquí el texto queda muy chico. Úsala para controlar el avance, o gira el teléfono.</span><button id="smallX" aria-label="Cerrar aviso">✕</button></div>
+<div id="index" hidden role="dialog" aria-modal="true" aria-label="Índice de diapositivas">
+  <header><h2>Índice</h2><span style="color:var(--on-ink-2);font-size:14px">Toca una diapositiva para ir a ella · Esc para cerrar</span><button class="bb" id="ixClose" style="margin-left:auto">Cerrar</button></header>
+  <div class="grid" id="ixGrid"></div>
+</div>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   1 · DATOS  (fuente única: los 20 registros de la encuesta)
+   ===================================================================== */
+const PEOPLE = [
+  ["Prof. Geovanna",0,10,3,1],["Prof. Jair",1,3,1,1],["Prof. Christian",3,6,2,0],["Prof. Marcela",1,8,3,1],["Prof. Christopher",2,6,4,1],
+  ["Juli",3,2,5,0],["Prof. Whanda",2,10,2,0],["Sor Adriana",3,8,10,0],["Mariam",2,5,4,0],["Walter",5,4,1,1],
+  ["Prof. Yessenia",3,2,3,0],["Prof. Daniel",3,2,1,1],["Prof. Mario",3,10,3,1],["Persona 14",3,4,4,1],["Persona 15",2,6,3,0],
+  ["Persona 16",3,7,5,1],["Persona 17",1,5,4,1],["Persona 18",3,8,3,0],["Persona 19",2,3,6,1],["Persona 20",0,6,2,0]
+].map(([name,herm,horas,casa,dep],i)=>({id:i+1,name,herm,horas,casa,dep}));
+
+const VARS = {
+  herm: {label:"Hermanos",        q:"¿Cuántos hermanos tiene?",                              unit:"hermanos",         axis:[0,5],  type:"Numérica"},
+  horas:{label:"Horas en redes",  q:"¿Cuántas horas semanales le dedica a redes sociales?", unit:"horas por semana", axis:[2,10], type:"Numérica"},
+  casa: {label:"Personas en casa",q:"¿Cuántas personas viven en su casa?",                  unit:"personas",         axis:[1,10], type:"Numérica"},
+  dep:  {label:"Pregunta difícil", q:"Una pregunta difícil de su área: ¿la respondió?",                 unit:"Sí = 1 · No = 0",  axis:[0,1],  type:"Categórica · Sí / No", cat:{0:"No",1:"Sí"}}
+};
+const VKEYS = ["herm","horas","casa","dep"];
+const SPEAKERS = {ale:{n:"Alejandro",c:"var(--ale)",r:"datos y lectura"},sumi:{n:"Sumi",c:"var(--sumi)",r:"datos e interpretación"},gabriel:{n:"Gabriel",c:"var(--gabriel)",r:"lo cuantitativo y los cálculos"}};
+const CHAPTERS = ["Introducción","Pregunta","Organización","Cálculos","Diagnóstico","Cierre"];
+
+/* =====================================================================
+   2 · CÁLCULOS  (método del proyecto: posición (n + 1)·p e interpolación)
+   ===================================================================== */
+function quartile(sorted,p){
+  const n=sorted.length, pos=(n+1)*p, k=Math.floor(pos), d=Math.round((pos-k)*1e9)/1e9;
+  const a=sorted[k-1], b=sorted[Math.min(k,n-1)];
+  return {pos,k,d,a,b,value:a+d*(b-a)};
+}
+function describe(vals){
+  const n=vals.length, sorted=[...vals].sort((x,y)=>x-y), sum=vals.reduce((s,v)=>s+v,0), mean=sum/n;
+  const freq=[]; sorted.forEach(v=>{const l=freq[freq.length-1]; if(l&&l.x===v) l.f++; else freq.push({x:v,f:1});});
+  let F=0; freq.forEach(r=>{F+=r.f; r.F=F; r.xf=r.x*r.f;});
+  const maxF=Math.max(...freq.map(r=>r.f)), modes=freq.filter(r=>r.f===maxF).map(r=>r.x);
+  const Q1=quartile(sorted,.25), Q2=quartile(sorted,.5), Q3=quartile(sorted,.75);
+  const iqr=Q3.value-Q1.value, lo=Q1.value-1.5*iqr, hi=Q3.value+1.5*iqr;
+  const inside=sorted.filter(v=>v>=lo&&v<=hi);
+  return {n,sorted,sum,mean,freq,maxF,mo:modes[0],modes,Q1,Q2,Q3,q1:Q1.value,me:Q2.value,q3:Q3.value,
+          dLo:Q2.value-Q1.value,dHi:Q3.value-Q2.value,
+          min:sorted[0],max:sorted[n-1],iqr,lo,hi,wLo:inside[0],wHi:inside[inside.length-1],out:sorted.filter(v=>v<lo||v>hi)};
+}
+const S = {n:PEOPLE.length, resp:PEOPLE.length*4};
+VKEYS.forEach(k=>S[k]=describe(PEOPLE.map(p=>p[k])));
+S.dep.pct = S.dep.mean;                                                  // proporción de Sí
+S.herm.low01 = PEOPLE.filter(p=>p.herm<=1).length;                       // personas con 0 o 1 hermano
+S.casaSin = describe(PEOPLE.map(p=>p.casa).filter(v=>!S.casa.out.includes(v)));   // comparación ilustrativa (n = 19)
+S.salary  = describe([1000,1000,1000,1000,1000,1000,1000,1000,1000,50000]);       // pregunta 3
+S.ages    = describe([18,19,19,20,20,21,21,22,22,45]);                            // pregunta 5
+S.q4      = (()=>{const a=4,b=8,d=.25; return {a,b,d,value:a+d*(b-a)};})();       // pregunta 4
+
+const fmt=v=>{ if(typeof v!=="number") return String(v); const r=Math.round(v*100)/100; return String(r).replace(".",",").replace("-","−"); };
+const fmtK=v=>String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g," ");
+const fmtPct=v=>fmt(v*100)+" %";
+const resolve=p=>p.split(".").reduce((o,k)=>o==null?undefined:o[k],S);
+
+/* Comprobación independiente: se recalcula desde los 20 registros sin usar describe()
+   (conteo directo, suma con bucle, ordenamiento por inserción y la fórmula de posición escrita aparte). */
+const INDEP=(()=>{
+  const out=[], push=(name,a,b)=>out.push({name,a,b,ok:Math.abs(a-b)<1e-9});
+  VKEYS.forEach(k=>{
+    const vals=[]; for(const p of PEOPLE) vals.push(p[k]);
+    let sum=0; for(const v of vals) sum+=v;
+    push(`${k} · suma de los 20 registros`,sum,S[k].sum);
+    push(`${k} · media`,sum/vals.length,S[k].mean);
+    S[k].freq.forEach(r=>push(`${k} · frecuencia de ${r.x}`,vals.filter(v=>v===r.x).length,r.f));
+    const s=[]; vals.forEach(v=>{let i=s.length; while(i>0&&s[i-1]>v) i--; s.splice(i,0,v);});
+    [[.25,"q1","Q₁"],[.5,"me","Me"],[.75,"q3","Q₃"]].forEach(([p,key,lab])=>{ const pos=(s.length+1)*p, lo=Math.floor(pos), fr=pos-lo; push(`${k} · ${lab} (posición ${fmt(pos)})`,s[lo-1]+(s[lo]-s[lo-1])*fr,S[k][key]); });
+  });
+  const c=PEOPLE.map(p=>p.casa).filter(v=>v!==10); push("casa sin el 10 · media (n = 19)",c.reduce((a,b)=>a+b,0)/c.length,S.casaSin.mean);
+  return out;
+})();
+/* Valores publicados en la versión anterior (solo para detectar cambios accidentales). */
+const PUBLISHED = {
+  herm:{min:0,max:5,mo:3,sum:45,mean:2.25,q1:1.25,me:2.5,q3:3}, horas:{min:2,max:10,mo:6,sum:115,mean:5.75,q1:3.25,me:6,q3:8},
+  casa:{min:1,max:10,mo:3,sum:69,mean:3.45,q1:2,me:3,q3:4,iqr:2,hi:7}, dep:{min:0,max:1,mo:1,sum:11,mean:.55,q1:0,me:1,q3:1},
+  salary:{mean:5900,me:1000}, ages:{me:20.5,mean:22.7,q1:19,q3:22,iqr:3,hi:26.5}, q4:{value:5}
+};
+const CHECKS=[]; for(const g in PUBLISHED) for(const k in PUBLISHED[g]) CHECKS.push({g,k,pub:PUBLISHED[g][k],calc:S[g][k],ok:Math.abs(S[g][k]-PUBLISHED[g][k])<1e-9});
+
+/* =====================================================================
+   3 · PRESENTACIÓN
+   ===================================================================== */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const NS="http://www.w3.org/2000/svg";
+const sv=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e;};
+/* tres niveles de movimiento: interfaz (breve), escena (medio), explicación (secuencial) */
+const T_UI=180, T_SCENE=620, T_SEQ=640;
+const EASE="cubic-bezier(.22,.72,.12,1)", EASE_IO="cubic-bezier(.65,0,.35,1)", POP="cubic-bezier(.3,1.35,.5,1)";
+const stage=$("#stage"), app=$("#app"), fly=$("#fly"), slides=$$(".slide",stage);
+const mq=matchMedia("(prefers-reduced-motion: reduce)");
+const store={get(k){try{return localStorage.getItem("rya3."+k)}catch(e){return null}},set(k,v){try{localStorage.setItem("rya3."+k,v)}catch(e){}},del(k){try{localStorage.removeItem("rya3."+k)}catch(e){}}};
+const st={i:0,step:0,motion:!mq.matches,motionManual:false,all:false,scale:1,drawer:false,tab:"notes"};
+{const m=store.get("motion"); if(m!==null){ st.motion=m==="1"; st.motionManual=true; }}
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const SC={};
+const timers=new Set();
+const later=(fn,ms)=>{const t=setTimeout(()=>{timers.delete(t);fn();},ms); timers.add(t); return t;};
+const clearLater=()=>{timers.forEach(clearTimeout); timers.clear();};
+
+function anim(el,frames,o){ if(!st.motion||!el) return null; return el.animate(frames,Object.assign({duration:480,easing:EASE,fill:"backwards"},o||{})); }
+function finishAll(root){ (root||stage).getAnimations({subtree:true}).forEach(a=>{ try{a.finish()}catch(e){a.cancel()} }); }
+const isRunning=sl=>sl.getAnimations({subtree:true}).some(a=>a.playState==="running"&&a.effect&&a.effect.getComputedTiming().duration>300);
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2200); }
+
+function fillTemplates(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT), nodes=[];
+  while(w.nextNode()) if(w.currentNode.nodeValue.includes("{{")) nodes.push(w.currentNode);
+  nodes.forEach(n=>{ n.nodeValue=n.nodeValue.replace(/\{\{([\w.]+)(?:\|(\w+))?\}\}/g,(m,p,f)=>{ const v=resolve(p); if(v===undefined){console.error("Valor no encontrado:",p); return m;} return f==="k"?fmtK(v):f==="pct"?fmtPct(v):fmt(v); }); });
+}
+
+/* Apariciones. Regla: los elementos posicionados se colocan con left/top (o atributos SVG);
+   transform queda libre para estas animaciones, así un escalado nunca reemplaza una traslación. */
+function fx(el,type,delay){
+  delay=delay||0;
+  switch(type){
+    case "draw": return anim(el,[{strokeDashoffset:1},{strokeDashoffset:0}],{duration:T_SEQ,delay,easing:EASE_IO});
+    case "mask": return anim(el,[{clipPath:"inset(0 100% 0 0)"},{clipPath:"inset(0 0% 0 0)"}],{duration:560,delay,easing:EASE_IO});
+    case "grow": return anim(el,[{transform:"scaleY(0)"},{transform:"scaleY(1)"}],{duration:520,delay});
+    case "growx":return anim(el,[{transform:"scaleX(0)"},{transform:"scaleX(1)"}],{duration:520,delay});
+    case "pop":  return anim(el,[{opacity:0,transform:"scale(.6)"},{opacity:1,transform:"scale(1)"}],{duration:280,delay,easing:POP});
+    case "up":   return anim(el,[{opacity:0,transform:"translateY(14px)"},{opacity:1,transform:"none"}],{duration:440,delay});
+    default:     return anim(el,[{opacity:0},{opacity:1}],{duration:380,delay});
+  }
+}
+function applyGeneric(sl,step,animate){
+  let k=0;
+  $$("[data-s]",sl).forEach(el=>{
+    const on=step>=+el.dataset.s && (el.dataset.e==null||step<+el.dataset.e);
+    const was=!el.classList.contains("off");
+    el.classList.toggle("off",!on);
+    if(on&&!was&&animate) fx(el,el.dataset.fx||"up",(+el.dataset.dl||0)+(k++)*60);
+  });
+  let any=false;
+  $$("[data-f]",sl).forEach(el=>{ const on=el.dataset.f.split(" ").map(Number).includes(step); el.classList.toggle("is-f",on); if(on) any=true; });
+  sl.classList.toggle("focusing",any);
+}
+/* Entrada de escena: el título se descubre con una máscara; el resto aparece sin desplazamiento. */
+function enterGeneric(sl,delay){
+  let k=0;
+  $$(".in",sl).forEach(el=>{ if(el.classList.contains("off")) return; fx(el,el.dataset.fx||(el.matches(".t,.qt")?"mask":"fade"),delay+(k++)*55); });
+}
+
+/* Fichas fantasma: unen un objeto de una escena con el mismo objeto en la siguiente. */
+function ghost(from,to,o){
+  o=o||{}; const g=document.createElement("div"); g.className="ghost"; g.textContent=o.text||"";
+  if(o.fs) g.style.fontSize=o.fs;
+  const a1={left:from.x+"px",top:from.y+"px",width:from.w+"px",height:from.h+"px",backgroundColor:o.bg||"rgba(0,0,0,0)",color:o.fg||"#fff",borderColor:o.border||"rgba(0,0,0,0)",borderRadius:o.radius||"7px",opacity:1};
+  const a2={left:to.x+"px",top:to.y+"px",width:to.w+"px",height:to.h+"px",backgroundColor:o.bg2||a1.backgroundColor,color:o.fg2||a1.color,borderColor:o.border2||a1.borderColor,borderRadius:o.radius2||a1.borderRadius,opacity:1};
+  Object.assign(g.style,a2,{opacity:0}); fly.appendChild(g);
+  const kf=o.fadeOut?[a1,Object.assign({},a2,{offset:.7}),Object.assign({},a2,{opacity:0})]:[a1,a2];
+  const a=g.animate(kf,{duration:(o.dur||620)*(o.fadeOut?1.4:1),delay:o.delay||0,easing:EASE,fill:"both"});
+  const done=()=>g.remove(); a.onfinish=done; a.oncancel=done; return a;
+}
+const visible=el=>el&&!el.closest(".off")&&el.getBoundingClientRect().width>0;
+
+/* =====================================================================
+   3a · Cromo de cada diapositiva
+   ===================================================================== */
+const FIXED_NOTES=new Set(["vocab","preguntas","f-casa","a3","box","atipico","veredicto","a5","porque","conclusion","a6"]);
+function chrome(sl,idx){
+  const sp=SPEAKERS[sl.dataset.speaker], ch=+sl.dataset.ch;
+  sl._notes=(($("aside.notes",sl)||{}).textContent||"").trim();
+  const hdr=document.createElement("div"); hdr.className="hdr";
+  const chip=`<div class="chip-sp"><i style="background:${sp.c}">${sp.n[0]}</i>${sp.n}<small>expone</small></div>`;
+  if(!sl.classList.contains("cover")){
+    const r=["Pregunta","Organización","Cálculos","Diagnóstico"].map((t,j)=>`<span class="${j+1<ch?"past":j+1===ch?"now":""}"><em>0${j+1}</em>${t}</span>`).join("");
+    hdr.innerHTML=`<div class="mroute" aria-label="Capítulo: ${CHAPTERS[ch]}">${r}</div>${chip}`;
+  } else hdr.innerHTML=`<span></span>${chip}`;
+  sl.prepend(hdr);
+  const f=document.createElement("div"); f.className="ftr";
+  f.innerHTML=`<span>Recolección y Análisis · Sección 10-A</span><b>${String(idx+1).padStart(2,"0")} / ${slides.length}</b>`; sl.appendChild(f);
+}
+
+/* =====================================================================
+   3b · Constelación: 20 personas · 80 respuestas · 4 grupos
+   ===================================================================== */
+function constellation(svg,kind){
+  const C=300,R=kind==="end"?150:98, cell=15, gap=6, gw=5*cell+4*gap, gh=4*cell+3*gap;
+  const centers={herm:[116,128],horas:[484,128],casa:[484,472],dep:[116,472]};
+  const people=PEOPLE.map((p,i)=>{const a=(-90+i*18)*Math.PI/180; return {x:C+R*Math.cos(a),y:C+R*Math.sin(a)};});
+  const gL=sv("g",{},svg), gM=sv("g",{},svg), gP=sv("g",{},svg), gT=sv("g",{},svg);
+  const out={people,marks:[],lines:[],dots:[],arcs:[],labels:[]};
+  VKEYS.forEach((k,ki)=>{
+    const [cx,cy]=centers[k];
+    PEOPLE.forEach((p,i)=>{
+      const x=cx-gw/2+(i%5)*(cell+gap), y=cy-gh/2+Math.floor(i/5)*(cell+gap), mx=x+cell/2, my=y+cell/2;
+      out.lines.push({el:sv("path",{d:`M${people[i].x.toFixed(1)} ${people[i].y.toFixed(1)}L${mx} ${my}`,pathLength:1,class:"c-line",stroke:`var(--${k})`},gL),i,ki});
+      out.marks.push({el:sv("rect",{x,y,width:cell,height:cell,rx:3.5,fill:`var(--${k})`,class:"c-mark"},gM),i,ki,dx:people[i].x-mx,dy:people[i].y-my});
+    });
+    const top=cy<300, ty=top?cy-gh/2-30:cy+gh/2+26, g=sv("g",{},gT);
+    sv("text",{x:cx,y:ty,"text-anchor":"middle",class:"c-lab",fill:`var(--${k}-l)`},g).textContent=VARS[k].label;
+    sv("text",{x:cx,y:ty+17,"text-anchor":"middle",class:"c-sub"},g).textContent="20 respuestas";
+    out.labels.push(g);
+  });
+  people.forEach((p,i)=>{
+    out.dots.push(sv("circle",{cx:p.x,cy:p.y,r:6.5,class:"c-person"},gP));
+    if(kind==="end") VKEYS.forEach((k,q)=>{
+      const a0=(-90+q*90+14)*Math.PI/180, a1=(-90+(q+1)*90-14)*Math.PI/180, r=15;
+      out.arcs.push({el:sv("path",{d:`M${(p.x+r*Math.cos(a0)).toFixed(2)} ${(p.y+r*Math.sin(a0)).toFixed(2)}A${r} ${r} 0 0 1 ${(p.x+r*Math.cos(a1)).toFixed(2)} ${(p.y+r*Math.sin(a1)).toFixed(2)}`,pathLength:1,class:"c-arc",stroke:`var(--${k})`},gP),i,q});
+    });
+  });
+  const c1=sv("text",{x:C,y:C+10,"text-anchor":"middle",class:"c-center",style:kind==="end"?"font-size:64px":""},gT); c1.textContent="20";
+  const c2=sv("text",{x:C,y:C+(kind==="end"?42:32),"text-anchor":"middle",class:"c-center2"},gT); c2.textContent="PERSONAS";
+  out.center=[c1,c2];
+  return out;
+}
+SC.cover={
+  build(sl){ sl._c=constellation($("#cover-svg"),"cover");
+    const lg=document.createElement("div"); lg.className="clegend";
+    lg.innerHTML=`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--on-ink);vertical-align:-1px"></span> persona (20) &nbsp;·&nbsp; <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--horas);vertical-align:-1px"></span> una respuesta (80): cada línea une a una persona con sus 4 respuestas`; sl.appendChild(lg); },
+  enter(sl,d){ const c=sl._c;
+    $$("h1 .ln>span",sl).forEach((e,k)=>anim(e,[{transform:"translateY(105%)"},{transform:"none"}],{duration:760,delay:d+60+k*110}));
+    fx($(".kick",sl),"fade",d);
+    c.dots.forEach((e,i)=>anim(e,[{opacity:0,transform:"scale(0)"},{opacity:1,transform:"scale(1)"}],{duration:340,delay:d+220+i*28,easing:POP}));
+    c.center.forEach(e=>fx(e,"fade",d+260));
+    c.marks.forEach(m=>anim(m.el,[{opacity:0,transform:`translate(${m.dx}px,${m.dy}px) scale(.3)`},{opacity:1,transform:"none"}],{duration:780,delay:d+820+m.i*20+m.ki*60}));
+    c.lines.forEach(l=>anim(l.el,[{strokeDashoffset:1},{strokeDashoffset:0}],{duration:780,delay:d+820+l.i*20+l.ki*60,easing:EASE_IO}));
+    c.labels.forEach((g,k)=>fx(g,"fade",d+1450+k*80));
+  }
+};
+SC.gracias={
+  build(sl){ const c=sl._c=constellation($("#end-svg"),"end");
+    c.marks.forEach(m=>{m.el.style.opacity=0; m.el.style.transform=`translate(${m.dx}px,${m.dy}px) scale(.3)`;});
+    c.lines.forEach(l=>l.el.style.strokeDashoffset=1);
+    c.labels.forEach(g=>g.style.opacity=0);
+    c.dots.forEach(d=>d.setAttribute("r",4));
+    const lg=document.createElement("div"); lg.className="clegend"; lg.innerHTML="Las 80 respuestas regresan a sus 20 personas.<br>Cada unidad: <span style='color:var(--herm-l)'>hermanos</span> · <span style='color:var(--horas-l)'>redes</span> · <span style='color:var(--casa-l)'>casa</span> · <span style='color:var(--dep-l)'>pregunta difícil</span>"; sl.appendChild(lg); },
+  enter(sl,d){ const c=sl._c;
+    $$("h1 .ln>span",sl).forEach((e,k)=>anim(e,[{transform:"translateY(105%)"},{transform:"none"}],{duration:860,delay:d+200+k*160}));
+    c.labels.forEach(g=>anim(g,[{opacity:1},{opacity:0}],{duration:500,delay:d}));
+    c.marks.forEach(m=>anim(m.el,[{opacity:1,transform:"none"},{opacity:0,transform:`translate(${m.dx}px,${m.dy}px) scale(.3)`}],{duration:1100,delay:d+300+m.i*30+m.ki*60,easing:EASE_IO}));
+    c.lines.forEach(l=>anim(l.el,[{strokeDashoffset:0},{strokeDashoffset:1}],{duration:1100,delay:d+300+l.i*30+l.ki*60,easing:EASE_IO}));
+    c.arcs.forEach(a=>anim(a.el,[{strokeDashoffset:1},{strokeDashoffset:0}],{duration:600,delay:d+1500+a.i*40+a.q*80,easing:EASE}));
+  }
+};
+
+/* =====================================================================
+   3c · Ruta, matriz de respuestas y datos brutos
+   ===================================================================== */
+SC.ruta={ apply(sl,step){ $$("[data-rstop]",sl).forEach(e=>e.classList.toggle("active",+e.dataset.rstop===step)); } };
+
+SC.preguntas={
+  build(sl){
+    const m=$("#matrix",sl); let h=`<div class="mxl">20 personas</div>`;
+    PEOPLE.forEach(p=>h+=`<div class="pdot" data-s="0">${p.id}</div>`);
+    VKEYS.forEach(k=>{
+      const V=VARS[k];
+      h+=`<div class="mq"><span class="vglyph c-${k} ${k}"><svg class="ic"><use href="#i-${k}"/></svg></span><p>${V.q}</p><span class="tag" data-s="2" style="background:var(--${k}-t);color:var(--${k}-ink)">${V.type.split(" · ")[0]}</span></div>`;
+      PEOPLE.forEach(p=>h+=`<div class="cell c-${k} ${k}" data-cell data-k="${k}" data-col="${p.id}">${V.cat?V.cat[p[k]]:p[k]}</div>`);
+    });
+    m.innerHTML=h; sl._cells=$$("[data-cell]",m);
+  },
+  apply(sl,step,animate,prev){
+    sl._cells.forEach(c=>c.classList.toggle("off",step<1));
+    if(animate&&step>=1&&prev<1) sl._cells.forEach((c,k)=>anim(c,[{opacity:0,transform:"translateY(-22px)"},{opacity:1,transform:"none"}],{duration:380,delay:(+c.dataset.col-1)*35+Math.floor(k/20)*20}));
+  }
+};
+const rawCell=(root,id,k)=>$(`${id<=10?"#raw1":"#raw2"} tbody tr:nth-child(${(id-1)%10+1}) td[data-k="${k}"]`,root);
+SC.brutos={
+  build(sl){
+    const head=`<thead><tr><th>#</th><th>Persona</th><th data-k="herm">Herm.</th><th data-k="horas">Horas</th><th data-k="casa">Casa</th><th data-k="dep">¿Respondió?</th></tr></thead>`;
+    const row=p=>`<tr><td>${p.id}</td><td>${p.name}</td>${VKEYS.map(k=>`<td class="cv ${k==="dep"?(p.dep?"yes":"no"):""} ${k==="casa"&&S.casa.out.includes(p.casa)?"mark10":""}" data-k="${k}">${k==="dep"?VARS.dep.cat[p.dep]:p[k]}</td>`).join("")}</tr>`;
+    $("#raw1",sl).innerHTML=head+"<tbody>"+PEOPLE.slice(0,10).map(row).join("")+"</tbody>";
+    $("#raw2",sl).innerHTML=head+"<tbody>"+PEOPLE.slice(10).map(row).join("")+"</tbody>";
+    $$(".cb",sl).forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation();
+      const k=b.dataset.hl, on=b.getAttribute("aria-pressed")!=="true";
+      $$(".cb",sl).forEach(x=>x.setAttribute("aria-pressed","false"));
+      $$("[data-k]",sl).forEach(td=>VKEYS.forEach(v=>td.classList.remove("hl-"+v)));
+      if(on){ b.setAttribute("aria-pressed","true"); $$(`[data-k="${k}"]`,sl).forEach(td=>td.classList.add("hl-"+k)); }
+    }));
+  },
+  enter(sl,d,o){ if(o&&o.link) return; $$("tbody tr",sl).forEach((tr,k)=>anim(tr,[{opacity:0},{opacity:1}],{duration:300,delay:d+150+(k%10)*30+Math.floor(k/10)*100})); }
+};
+
+/* =====================================================================
+   3d · Tablas de frecuencia (7 pasos, con recorrido abreviado)
+   ===================================================================== */
+const FQ_NAMES=["Aparecen los datos","Se ordenan","Se agrupan","Frecuencia","Tabla","Barras","Moda y media"];
+const FQ_LABELS=["Aparecen","Se ordenan","Se agrupan","Frecuencia","Tabla","Barras","Moda y media"];
+const FQ_SHORT=[0,3,6];
+function buildFreq(sl){
+  const key=sl.dataset.var, D=S[key], V=VARS[key], area=$(".fq-stage",sl);
+  sl.style.setProperty("--vc",`var(--${key})`); sl.style.setProperty("--vt",`var(--${key}-t)`); sl.style.setProperty("--vi",`var(--${key}-ink)`);
+  sl.style.setProperty("--vtx",key==="casa"?"var(--ink)":"#fff"); sl.style.setProperty("--vsm",key==="casa"?"rgba(11,17,30,.6)":"rgba(255,255,255,.75)");
+  sl._short=key!=="herm"; sl._seq=()=>sl._short?FQ_SHORT:[0,1,2,3,4,5,6];
+  const stp=$(".stepper",sl);
+  stp.innerHTML=FQ_LABELS.map((t,k)=>`<span data-k="${k}"><em>${k+1}</em>${t}</span>`).join("")+`<button class="cb shortbtn nonav" aria-pressed="${sl._short}" title="Recorrido abreviado: 3 pasos (1, 4 y 7). Completo: los 7 pasos.">Recorrido abreviado</button>`;
+  const sb=$(".shortbtn",stp);
+  sb.addEventListener("click",e=>{ e.stopPropagation(); sl._short=!sl._short; sb.setAttribute("aria-pressed",String(sl._short)); stepperState(sl); ui(); toast(sl._short?"Recorrido abreviado: 3 pasos en esta diapositiva":"Recorrido completo: 7 pasos en esta diapositiva"); });
+  const X0=40, W=640, baseY=356, [lo,hi]=V.axis, nS=hi-lo+1, slotW=W/nS, unit=Math.min(36,(baseY-48)/D.maxF);
+  const cw=Math.min(54,slotW-12), ch=unit-4, slotX=v=>X0+(v-lo)*slotW;
+  const cnt={}; D.freq.forEach(r=>cnt[r.x]=r.f);
+  const at=(x,y,extra)=>Object.assign({left:x+"px",top:y+"px"},extra||{});
+  const add=(cls,html,style)=>{const e=document.createElement("div"); e.className=cls; if(html!=null) e.innerHTML=html; if(style) Object.assign(e.style,style); area.appendChild(e); return e;};
+  const L={grid:[],axis:[],cnt:[],bars:[],mean:[]};
+  for(let f=0;f<=D.maxF;f++){ L.grid.push(add("fgrid",null,at(X0,baseY-f*unit,{width:W+"px"}))); L.grid.push(add("fylab",f,at(0,baseY-f*unit-8))); }
+  L.grid.push(add("faxt","f<sub>i</sub>",at(6,baseY-D.maxF*unit-34)));
+  for(let v=lo;v<=hi;v++){
+    const f=cnt[v]||0;
+    L.axis.push(add("fxlab",v,at(slotX(v),baseY+8,{width:slotW+"px"})));
+    if(f){ const b=add("fbar"+(v===D.mo?" ismode":""),null,at(slotX(v)+(slotW-cw)/2-5,baseY-f*unit-4,{width:(cw+10)+"px",height:(f*unit+4)+"px"})); b.dataset.x=v; L.bars.push(b); }
+    const c=add("fcnt"+(f?"":" zero"),(v===D.mo?`<span class="mo">MODA</span>`:"")+f,at(slotX(v),baseY-f*unit-(v===D.mo?40:26),{width:slotW+"px"})); c.dataset.x=v; L.cnt.push(c);
+  }
+  L.axis.push(add("fbase",null,at(X0,baseY,{width:W+"px"})));
+  L.axis.push(add("faxt","x<sub>i</sub>",at(10,baseY+8)));
+  const mx=slotX(D.mean)+slotW/2;
+  L.mean.push(add("fmean",null,at(mx,baseY-D.maxF*unit-8,{height:(D.maxF*unit+8)+"px"})));
+  L.mean.push(add("fmeanl",`x̄ = ${fmt(D.mean)}`,at(mx,baseY+36)));
+  const gx=X0+(W-(10*56+9*8))/2, gpos=k=>({x:gx+(k%10)*64,y:150+Math.floor(k/10)*58,w:56,h:46});
+  const cap=add("fcap","",at(gx,112));
+  const chips=PEOPLE.map((p,gi)=>{const e=add("chip",`<small>#${p.id}</small>${p[key]}`); e.dataset.x=p[key]; if(p[key]===D.mo) e.classList.add("ismode"); if(D.out.includes(p[key])) e.dataset.out=1; return {el:e,v:p[key],id:p.id,gi};});
+  [...chips].sort((a,b)=>a.v-b.v||a.id-b.id).forEach((c,k)=>c.si=k);
+  const seen={}; chips.forEach(c=>{c.stk=seen[c.v]=(seen[c.v]===undefined?0:seen[c.v]+1);});
+  chips.forEach(c=>{c.pos=[gpos(c.gi),gpos(c.si),{x:slotX(c.v)+(slotW-cw)/2,y:baseY-(c.stk+1)*unit+2,w:cw,h:ch}];});
+  const t=$(".ft",sl);
+  t.innerHTML=`<thead><tr><th>x<sub>i</sub></th><th>f<sub>i</sub></th><th>F<sub>i</sub></th><th>x<sub>i</sub>·f<sub>i</sub></th></tr></thead><tbody>${D.freq.map(r=>`<tr tabindex="0" data-x="${r.x}" class="${r.x===D.mo?"mode":""}"><td>${r.x}</td><td>${r.f}</td><td>${r.F}</td><td>${r.xf}</td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td>${D.n}</td><td></td><td>${D.sum}</td></tr></tfoot>`;
+  const link=(x,on)=>$$(`[data-x="${x}"]`,area).concat($$(`tr[data-x="${x}"]`,t)).forEach(e=>e.classList.toggle("lnk",on));
+  $$("tbody tr",t).forEach(tr=>{ const x=tr.dataset.x;
+    ["mouseenter","focus"].forEach(ev=>tr.addEventListener(ev,()=>link(x,true)));
+    ["mouseleave","blur"].forEach(ev=>tr.addEventListener(ev,()=>link(x,false))); });
+  L.bars.forEach(b=>{ b.addEventListener("mouseenter",()=>link(b.dataset.x,true)); b.addEventListener("mouseleave",()=>link(b.dataset.x,false)); });
+  sl._fq={chips,L,cap,key};
+}
+function place(c,p,animate,delay,lift){
+  const to={transform:`translate(${p.x}px,${p.y}px)`,width:p.w+"px",height:p.h+"px"}, cur=c.cur;
+  Object.assign(c.el.style,to);
+  if(animate&&cur&&(cur.x!==p.x||cur.y!==p.y||cur.w!==p.w||cur.h!==p.h)){
+    const from={transform:`translate(${cur.x}px,${cur.y}px)`,width:cur.w+"px",height:cur.h+"px"};
+    const kf=lift?[from,{transform:`translate(${(cur.x+p.x)/2}px,${Math.min(cur.y,p.y)-lift}px)`,width:(cur.w+p.w)/2+"px",height:(cur.h+p.h)/2+"px",offset:.5},to]:[from,to];
+    anim(c.el,kf,{duration:T_SEQ,delay,easing:EASE});
+  }
+  c.cur=p;
+}
+function stepperState(sl){
+  const seq=sl._seq?sl._seq():null;
+  $$(".stepper span",sl).forEach(e=>{const k=+e.dataset.k; e.className=(k<st.step?"past":k===st.step?"now":"")+(seq&&!seq.includes(k)?" skip":"");});
+}
+function applyFreq(sl,step,animate,prev){
+  const {chips,L,cap,key}=sl._fq, lo=VARS[key].axis[0];
+  stepperState(sl);
+  const mode=step===0?0:step===1?1:2, pm=prev==null?mode:prev===0?0:prev===1?1:2;
+  chips.forEach(c=>place(c,c.pos[mode],animate,mode===1?c.si*14:mode===2?(c.v-lo)*40+c.stk*12:0,(mode!==pm&&mode<2)?30:0));
+  sl.classList.toggle("stk",step>=2); sl.classList.toggle("solid",step>=5); sl.classList.toggle("mode",step>=6);
+  chips.forEach(c=>c.el.classList.toggle("flag",step>=6&&!!c.el.dataset.out));
+  chips[0].el.classList.toggle("track",step<=2);
+  cap.textContent=step===0?"Orden en que llegaron · sigan la ficha #1 (Prof. Geovanna)":step===1?"Ordenados de menor a mayor · la ficha #1 ya está en su lugar":"";
+  const vis=(arr,on,type,base)=>arr.forEach((e,k)=>{const was=!e.classList.contains("off"); e.classList.toggle("off",!on); if(on&&!was&&animate) fx(e,type,(base||0)+k*30);});
+  vis(L.axis,step>=2,"fade",250); vis(L.cnt,step>=3,"pop"); vis(L.grid,step>=5,"fade"); vis(L.bars,step>=5,"grow"); vis(L.mean,step>=6,"fade",150);
+  if(animate&&step>=4&&prev<4) $$(".ft tbody tr",sl).forEach((tr,k)=>anim(tr,[{opacity:0},{opacity:1}],{duration:300,delay:120+k*55}));
+}
+["f-herm","f-horas","f-casa"].forEach(id=>SC[id]={build:buildFreq,apply:applyFreq,names:FQ_NAMES});
+
+/* =====================================================================
+   3e · Deporte: 20 marcas → Sí/No → círculo exacto
+   ===================================================================== */
+SC.deporte={
+  build(sl){
+    const D=S.dep, area=$("#dep-stage",sl), f0=D.freq.find(r=>r.x===0), f1=D.freq.find(r=>r.x===1);
+    $("#depft",sl).innerHTML=`<thead><tr><th>x<sub>i</sub></th><th>f<sub>i</sub></th><th>F<sub>i</sub></th><th>x<sub>i</sub>·f<sub>i</sub></th></tr></thead><tbody>
+      <tr><td>0 (No)</td><td>${f0.f}</td><td>${f0.F}</td><td>${f0.xf}</td></tr><tr class="mode"><td>1 (Sí)</td><td>${f1.f}</td><td>${f1.F}</td><td>${f1.xf}</td></tr></tbody><tfoot><tr><td>Total</td><td>${D.n}</td><td></td><td>${D.sum}</td></tr></tfoot>`;
+    const CX=260,CY=210,R=160;
+    const svg=sv("svg",{width:520,height:456,viewBox:"0 0 520 456",style:"overflow:visible"}); area.appendChild(svg);
+    const arcNo=sv("circle",{cx:CX,cy:CY,r:R,fill:"none",stroke:"#C9CED8","stroke-width":52,pathLength:D.n,"stroke-dasharray":`${f0.f} ${D.n}`,"stroke-dashoffset":-f1.f,transform:`rotate(-90 ${CX} ${CY})`},svg);
+    const arcSi=sv("circle",{cx:CX,cy:CY,r:R,fill:"none",stroke:"var(--dep)","stroke-width":52,pathLength:D.n,"stroke-dasharray":`${f1.f} ${D.n}`,transform:`rotate(-90 ${CX} ${CY})`},svg);
+    for(let k=0;k<D.n;k++){ const a=(-90+k*360/D.n)*Math.PI/180; sv("line",{x1:CX+(R-28)*Math.cos(a),y1:CY+(R-28)*Math.sin(a),x2:CX+(R+28)*Math.cos(a),y2:CY+(R+28)*Math.sin(a),stroke:"var(--paper)","stroke-width":2.5,class:"dtick"},svg); }
+    const add=(cls,html,x,y)=>{const e=document.createElement("div"); e.className=cls; e.innerHTML=html; e.style.left=x+"px"; e.style.top=y+"px"; area.appendChild(e); return e;};
+    const labSi=add("dglab",`Sí<small>· ${f1.f}</small>`,10,6), labNo=add("dglab",`No<small>· ${f0.f}</small>`,10,236);
+    const center=add("dcenter",`<b>${fmtPct(D.mean)}</b><span>dijo Sí</span>`,0,CY-44);
+    const eq=add("deq",`${f1.f} ÷ ${D.n} = ${fmt(D.mean)} = <b>${fmtPct(D.mean)}</b>`,0,404);
+    const marks=PEOPLE.map(p=>({el:add("dmark "+(p.dep?"si":"nn"),`${VARS.dep.cat[p.dep]}<small>#${p.id}</small>`,0,0),p}));
+    let si=0,no=0; const gx=(520-(4*86+62))/2;
+    marks.forEach((m,k)=>{
+      m.pos=[{x:gx+(k%5)*86,y:16+Math.floor(k/5)*96,w:62,h:62}];
+      if(m.p.dep){const j=si++; m.pos[1]={x:10+(j%6)*78,y:44+Math.floor(j/6)*76,w:60,h:60}; m.ring=j;}
+      else{const j=no++; m.pos[1]={x:10+(j%6)*78,y:274+Math.floor(j/6)*76,w:60,h:60}; m.ring=f1.f+j;}
+      const a=(-90+(m.ring+.5)*360/D.n)*Math.PI/180; m.pos[2]={x:CX+R*Math.cos(a)-19,y:CY+R*Math.sin(a)-19,w:38,h:38};
+    });
+    sl._d={marks,svg,arcSi,arcNo,labSi,labNo,center,eq,ticks:$$(".dtick",svg),area};
+  },
+  apply(sl,step,animate,prev){
+    const d=sl._d, m=step===0?0:step===1?1:2, pm=prev==null?m:Math.min(prev,2);
+    d.marks.forEach((c,k)=>place(c,c.pos[m],animate,m===2?c.ring*26:k*14,m!==pm&&m===1?26:0));
+    d.area.classList.toggle("onring",step>=2);
+    const vis=(e,on,type,dl)=>{const was=!e.classList.contains("off"); e.classList.toggle("off",!on); if(on&&!was&&animate) fx(e,type,dl);};
+    vis(d.labSi,step===1,"fade",280); vis(d.labNo,step===1,"fade",280);
+    [d.arcSi,d.arcNo].forEach(e=>vis(e,step>=2,"fade",0)); d.ticks.forEach(e=>vis(e,step>=2,"fade",0));
+    if(animate&&step>=2&&prev<2){ anim(d.arcSi,[{strokeDasharray:`0 ${S.dep.n}`},{strokeDasharray:`${S.dep.freq[1].f} ${S.dep.n}`}],{duration:860,delay:250,easing:EASE_IO});
+      anim(d.arcNo,[{strokeDasharray:`0 ${S.dep.n}`},{strokeDasharray:`${S.dep.freq[0].f} ${S.dep.n}`}],{duration:680,delay:860,easing:EASE_IO}); }
+    vis(d.center,step>=3,"pop",0); vis(d.eq,step>=3,"up",150);
+  }
+};
+
+/* =====================================================================
+   3f · Posiciones de los cuartiles
+   ===================================================================== */
+SC.posiciones={
+  build(sl){
+    const D=S.herm, box=$("#qs",sl), G=150, P=48.5, cx=k=>G+(k-1)*P+P/2;
+    let h=`<div class="qcap" style="top:34px">Posición</div><div class="qcap" style="top:72px">Valor del dato</div><div class="qcap" style="top:154px" data-s="4">Valor del cuartil</div>`;
+    D.sorted.forEach((v,k)=>{ h+=`<div class="qposn" style="left:${cx(k+1)-21}px;top:34px">${k+1}</div><div class="qchip" data-pos="${k+1}" style="left:${cx(k+1)-21}px;top:62px">${v}</div>`; });
+    [["Q₁",D.Q1,1],["Me",D.Q2,2],["Q₃",D.Q3,3]].forEach(([n,q,s])=>{
+      const x=cx(q.k)+q.d*P;
+      h+=`<div class="qpin" data-s="${s}" data-fx="grow" style="left:${x-1}px;transform-origin:50% 0"></div><div class="qtag" data-s="${s}" data-fx="fade" style="left:${x}px">${n} · posición ${fmt(q.pos)}</div>`;
+      h+=`<div class="qres" data-s="4" data-fx="fade" style="left:${x}px">${n} = ${fmt(q.value)}</div>`;
+    });
+    box.innerHTML=h; sl._q=[D.Q1,D.Q2,D.Q3];
+  },
+  apply(sl,step){
+    $$(".qchip",sl).forEach(c=>c.classList.remove("ab"));
+    if(step>=1&&step<=3){ const q=sl._q[step-1]; [q.k,q.k+1].forEach(p=>{const c=$(`.qchip[data-pos="${p}"]`,sl); c&&c.classList.add("ab");}); }
+  }
+};
+
+/* =====================================================================
+   3g · Interpolación por etapas (Q₁ de hermanos)
+   ===================================================================== */
+SC.interp={
+  build(sl){
+    const q=S.herm.Q1, svg=$("#isvg",sl), X0=170, X1=950, xv=v=>X0+(v-q.a)/(q.b-q.a||1)*(X1-X0), xr=xv(q.value), yP=48, yV=196, xp=X0+q.d*(X1-X0);
+    sl._ends={a:{x:X0,y:yV},b:{x:X1,y:yV},pos:{x:xp,y:yP}};
+    const g=s=>sv("g",s==null?{}:{"data-s":s,"data-fx":"fade"},svg);
+    const t=(par,x,y,txt,at)=>{const e=sv("text",Object.assign({x,y,fill:"var(--on-ink)","font-size":16,"text-anchor":"middle"},at||{}),par); e.textContent=txt; return e;};
+    const cap={"text-anchor":"start",fill:"var(--on-ink-2)","font-size":12.5,"font-family":"Atkinson Hyperlegible, sans-serif","letter-spacing":"1.6"};
+    const base=g(0);
+    t(base,0,yP+5,"POSICIÓN",cap); t(base,0,yV+5,"VALOR",cap);
+    sv("line",{x1:X0,x2:X1,y1:yP,y2:yP,stroke:"var(--on-ink-3)","stroke-width":2},base);
+    sv("line",{x1:X0,x2:X1,y1:yV,y2:yV,stroke:"var(--on-ink)","stroke-width":3},base);
+    [[X0,`posición ${q.k}`],[X1,`posición ${q.k+1}`]].forEach(([x,l])=>{sv("circle",{cx:x,cy:yP,r:6,fill:"var(--on-ink-3)"},base); t(base,x,yP-16,l,{fill:"var(--on-ink-2)","font-size":15});});
+    sv("rect",{x:xp-7,y:yP-7,width:14,height:14,fill:"var(--q)",transform:`rotate(45 ${xp} ${yP})`},base);
+    t(base,xp,yP-16,`posición ${fmt(q.pos)}`,{fill:"var(--q)","font-size":16,"font-weight":600});
+    t(base,X1,yV+76,"○ valor observado   ● valor interpolado   ◆ posición",{fill:"var(--on-ink-2)","font-size":13.5,"text-anchor":"end","font-family":"Atkinson Hyperlegible, sans-serif"});
+    const ab=g(1);
+    [[X0,`a = ${q.a}`,`dato ${q.k}`],[X1,`b = ${q.b}`,`dato ${q.k+1}`]].forEach(([x,l,s])=>{
+      sv("line",{x1:x,x2:x,y1:yP+8,y2:yV-12,stroke:"var(--on-ink-3)","stroke-width":1.5,"stroke-dasharray":"4 5"},ab);
+      sv("circle",{cx:x,cy:yV,r:10,fill:"var(--ink)",stroke:"var(--on-ink)","stroke-width":3},ab);
+      t(ab,x,yV+40,l,{"font-size":24,"font-weight":600}); t(ab,x+(x===X0?-8:8),yP+70,s,{fill:"var(--on-ink-3)","font-size":13,"text-anchor":x===X0?"end":"start"});
+    });
+    const dist=g(2);
+    sv("path",{d:`M${X0} ${yV-58}v-10H${X1}v10`,fill:"none",stroke:"var(--horas-l)","stroke-width":2},dist);
+    t(dist,(X0+X1)/2,yV-76,`distancia b − a = ${q.b} − ${q.a} = ${fmt(q.b-q.a)}`,{fill:"var(--horas-l)","font-size":18,"font-weight":600});
+    const fr=g(3);
+    sv("rect",{x:X0,y:yV-7,width:xr-X0,height:14,rx:3,fill:"var(--q)",opacity:.9},fr);
+    for(let k=1;k<4;k++) sv("line",{x1:X0+k*(X1-X0)/4,x2:X0+k*(X1-X0)/4,y1:yV-12,y2:yV+12,stroke:"var(--on-ink-3)","stroke-width":1.5},fr);
+    t(fr,X0-14,yV+76,`d = ${fmt(q.d)} → un cuarto de la distancia`,{fill:"var(--q)","font-size":15,"text-anchor":"start"});
+    const mv=g(4);
+    sv("path",{d:`M${X0} ${yV-26}H${xr-8}`,fill:"none",stroke:"var(--q)","stroke-width":3,"stroke-linecap":"round",pathLength:1,class:"drawme","stroke-dasharray":1},mv);
+    sv("path",{d:`M${xr-14} ${yV-33}l8 7-8 7`,fill:"none",stroke:"var(--q)","stroke-width":3,"stroke-linecap":"round","stroke-linejoin":"round"},mv);
+    t(mv,(X0+xr)/2,yV-36,`a + ${fmt(q.d)} · ${fmt(q.b-q.a)}`,{fill:"var(--q)","font-size":16,"font-weight":600});
+    const rs=g(5);
+    sv("line",{x1:xp,x2:xr,y1:yP+10,y2:yV-12,stroke:"var(--q)","stroke-width":1.2,"stroke-dasharray":"2 5",opacity:.7},rs);
+    sv("circle",{cx:xr,cy:yV,r:13,fill:"var(--q)",stroke:"var(--ink)","stroke-width":3},rs);
+    t(rs,xr+40,yV+46,`Q₁ = ${fmt(q.value)}`,{fill:"var(--q)","font-size":30,"font-weight":600,"text-anchor":"start","font-family":"IBM Plex Mono, monospace"});
+    t(rs,xr+238,yV+44,`valor interpolado`,{fill:"var(--on-ink-2)","font-size":14,"text-anchor":"start"});
+    sl._mv=$(".drawme",mv);
+  },
+  apply(sl,step,animate,prev){
+    const on={1:["a","ba"],2:["ba"],3:["d"],4:["a","p"],5:["q"]}[step]||[];
+    $$("#formula [data-t]",sl).forEach(e=>e.classList.toggle("on",on.includes(e.dataset.t)));
+    if(animate&&step===4&&prev<4) fx(sl._mv,"draw",100);
+  }
+};
+
+/* =====================================================================
+   3h · Tabla de medidas (con recuperación de los totales de frecuencia)
+   ===================================================================== */
+SC.medidas={
+  build(sl){
+    const rows=[["Mínimo","min"],["Máximo","max"],["Moda (Mo)","mo"],["Media (x̄)","mean"],["Q₁","q1"],["Mediana (Me)","me"],["Q₃","q3"]];
+    const cell=(k,m)=>{ const D=S[k]; if(m==="mean") return `${D.sum} ÷ ${D.n} = ${fmt(D.mean)}`;
+      if(k==="dep"&&["min","max","mo"].includes(m)) return `${D[m]} (${VARS.dep.cat[D[m]]})`; return fmt(D[m]); };
+    $("#mtab",sl).innerHTML=`<thead><tr><th>Medida</th>${VKEYS.map(k=>`<th class="v" data-c="${k}" tabindex="0" role="button" aria-pressed="false" style="color:var(--${k}-ink)">${VARS[k].label}</th>`).join("")}</tr></thead><tbody>${
+      rows.map(([l,m])=>`<tr data-m="${m}"><td>${l}</td>${VKEYS.map(k=>`<td class="mono" data-c="${k}">${cell(k,m)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    const setCol=k=>{ $$("th.v",sl).forEach(th=>th.setAttribute("aria-pressed",String(th.dataset.c===k))); $$("[data-c]",sl).forEach(c=>c.classList.toggle("dimc",!!k&&c.dataset.c!==k)); sl._col=k; };
+    $$("th.v",sl).forEach(th=>{ const go1=e=>{e.stopPropagation(); setCol(sl._col===th.dataset.c?null:th.dataset.c);};
+      th.addEventListener("click",go1); th.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go1(e);} }); });
+  },
+  apply(sl,step){ $$("#mtab tbody tr",sl).forEach(tr=>{ const c=["mean","me"].includes(tr.dataset.m); tr.classList.toggle("cmp",step>=1&&c); tr.classList.toggle("dimr",step>=1&&!c); }); },
+  enter(sl,d){ if(!st.motion) return;
+    later(()=>{ $$(".rc",sl).forEach((rc,i)=>{ const td=$(`tr[data-m="mean"] td[data-c="${rc.dataset.k}"]`,sl); if(!visible(td)) return;
+      ghost(rectIn(rc),rectIn(td),{text:rc.textContent,bg:css("--paper-2"),fg:css("--text"),border:css("--"+rc.dataset.k),bg2:"rgba(242,190,69,.35)",fs:"14px",delay:i*110,dur:700,fadeOut:true});
+      anim(td,[{boxShadow:"inset 0 0 0 0 rgba(0,0,0,0)"},{boxShadow:`inset 0 0 0 2px ${css("--text")}`,offset:.5},{boxShadow:"inset 0 0 0 0 rgba(0,0,0,0)"}],{duration:900,delay:i*110+600}); }); },d+T_SCENE+40);
+  }
+};
+
+/* =====================================================================
+   3i · Diagrama de caja por etapas
+   ===================================================================== */
+SC.box={
+  build(sl){
+    const svg=$("#bsvg",sl), A0=260, A1=1060, u=(A1-A0)/10, X=v=>A0+v*u, rows=[["herm",52],["horas",166],["casa",280]];
+    const mono="IBM Plex Mono, monospace";
+    rows.forEach(([k,y])=>{
+      const D=S[k], V=VARS[k];
+      const lab=sv("g",{},svg);
+      sv("text",{x:0,y:y-14,"font-size":20,"font-weight":700,fill:"var(--text)"},lab).textContent=V.label;
+      sv("text",{x:0,y:y+8,"font-size":14,fill:"var(--text-2)"},lab).textContent="en "+V.unit;
+      const cap=sv("text",{x:0,y:y+32,"font-size":13.5,fill:"var(--text-2)","font-family":mono},lab);
+      sv("tspan",{"data-s":1},cap).textContent=`Mín ${fmt(D.min)} · Máx ${fmt(D.max)}  `; sv("tspan",{"data-s":2},cap).textContent=`Q₁ ${fmt(D.q1)} · Q₃ ${fmt(D.q3)}`;
+      const cap2=sv("text",{x:0,y:y+50,"font-size":13.5,fill:"var(--text-2)","font-family":mono},lab);
+      sv("tspan",{"data-s":3},cap2).textContent=`Me ${fmt(D.me)}  `; sv("tspan",{"data-s":4},cap2).textContent=`x̄ ${fmt(D.mean)}`;
+      const sc=sv("g",{"data-s":0,"data-fx":"fade"},svg);
+      sv("line",{x1:A0,x2:A1,y1:y+42,y2:y+42,stroke:"#B9C0CC","stroke-width":1.5},sc);
+      for(let v=0;v<=10;v++){ sv("line",{x1:X(v),x2:X(v),y1:y+38,y2:y+46,stroke:"#B9C0CC","stroke-width":1.5},sc); sv("text",{x:X(v),y:y+64,"text-anchor":"middle","font-size":13,fill:"var(--text-3)","font-family":mono},sc).textContent=v; }
+      sv("text",{x:A1+12,y:y+47,"font-size":13,fill:"var(--text-2)"},sc).textContent=V.unit.split(" ")[0];
+      const w=sv("g",{"data-s":1,"data-fx":"fade"},svg);
+      sv("line",{x1:X(D.wLo),x2:X(D.wHi),y1:y,y2:y,stroke:"var(--text)","stroke-width":2.5},w);
+      [D.wLo,D.wHi].forEach(v=>sv("line",{x1:X(v),x2:X(v),y1:y-13,y2:y+13,stroke:"var(--text)","stroke-width":2.5},w));
+      sv("rect",{x:X(D.q1),y:y-22,width:X(D.q3)-X(D.q1),height:44,rx:3,fill:`var(--${k})`,stroke:"var(--text)","stroke-width":2,"data-s":2,"data-fx":"growx",style:"transform-box:fill-box;transform-origin:center"},svg);
+      const ql=sv("g",{"data-s":2,"data-fx":"fade","font-family":mono,"font-size":13,"font-weight":600,fill:"var(--text)"},svg);
+      sv("text",{x:X(D.q1)-4,y:y-30,"text-anchor":"end"},ql).textContent=`Q₁ ${fmt(D.q1)}`;
+      sv("text",{x:X(D.q3)+4,y:y-30,"text-anchor":"start"},ql).textContent=`Q₃ ${fmt(D.q3)}`;
+      sv("line",{x1:X(D.me),x2:X(D.me),y1:y-22,y2:y+22,stroke:"var(--text)","stroke-width":6,"data-s":3,"data-fx":"pop",style:"transform-box:fill-box;transform-origin:center"},svg);
+      sv("text",{x:X(D.me),y:y-30,"text-anchor":"middle","font-family":mono,"font-size":13,"font-weight":600,fill:"var(--text)","data-s":3,"data-fx":"fade"},svg).textContent=`Me ${fmt(D.me)}`;
+      sv("rect",{x:X(D.mean)-9,y:y-9,width:18,height:18,fill:"#fff",stroke:"var(--text)","stroke-width":2.5,transform:`rotate(45 ${X(D.mean)} ${y})`,"data-s":4,"data-fx":"fade"},svg);
+      if(D.out.length){ const o=sv("g",{"data-s":5,"data-fx":"fade"},svg);
+        D.out.forEach(v=>{ sv("circle",{cx:X(v),cy:y,r:12,fill:"var(--herm)",stroke:"var(--text)","stroke-width":2,class:"bout"},o);
+          sv("text",{x:X(v),y:y-22,"text-anchor":"middle","font-size":14,"font-weight":700,fill:"var(--herm-ink)"},o).textContent=`${v} · atípico`;
+          sv("text",{x:X(D.wHi),y:y+36,"text-anchor":"middle","font-size":12.5,fill:"var(--text-2)"},o).textContent=`bigote hasta ${D.wHi}`; });
+        sv("line",{x1:X(D.hi),x2:X(D.hi),y1:y-30,y2:y+30,stroke:"var(--bad)","stroke-width":1.5,"stroke-dasharray":"5 4"},o);
+        sv("text",{x:X(D.hi),y:y-34,"text-anchor":"middle","font-size":12.5,fill:"var(--bad)"},o).textContent=`límite ${D.hi}`;
+      }
+    });
+    const lg=sv("g",{transform:"translate(260 386)","font-size":14,fill:"var(--text-2)","data-s":2,"data-fx":"fade"},svg);
+    sv("rect",{x:0,y:-12,width:26,height:15,fill:"var(--rule-2)",stroke:"var(--text)"},lg); sv("text",{x:34,y:0},lg).textContent="50 % central (Q₁ a Q₃)";
+    sv("rect",{x:224,y:-14,width:5,height:19,fill:"var(--text)"},lg); sv("text",{x:238,y:0},lg).textContent="Mediana";
+    sv("rect",{x:330,y:-11,width:13,height:13,fill:"#fff",stroke:"var(--text)","stroke-width":2,transform:"rotate(45 336.5 -4.5)"},lg); sv("text",{x:352,y:0},lg).textContent="Media";
+    sv("circle",{cx:438,cy:-4,r:8,fill:"var(--herm)"},lg); sv("text",{x:452,y:0},lg).textContent="Valor atípico";
+    sv("text",{x:580,y:0},lg).textContent="Cada fila tiene su propia unidad.";
+  }
+};
+
+/* =====================================================================
+   3j · El caso del 10
+   ===================================================================== */
+SC.atipico={
+  build(sl){
+    const D=S.casa, S2=S.casaSin, svg=$("#osvg",sl), X0=34, X1=660, X=v=>X0+v*(X1-X0)/11, base=360, step=36, mono="IBM Plex Mono, monospace";
+    const g=s=>sv("g",{"data-s":s,"data-fx":"fade"},svg);
+    const zone=sv("rect",{x:X(D.hi),y:44,width:X1+10-X(D.hi),height:base+20-44,fill:"var(--herm-t)","data-s":3,"data-fx":"fade"},svg);
+    const ax=g(0);
+    sv("line",{x1:X0-10,x2:X1+10,y1:base+20,y2:base+20,stroke:"var(--text)","stroke-width":2},ax);
+    for(let v=0;v<=11;v++) sv("text",{x:X(v),y:base+44,"text-anchor":"middle","font-size":15,fill:"var(--text-2)"},ax).textContent=v;
+    sv("text",{x:X0-10,y:22,"font-size":15,"font-weight":600,fill:"var(--text)","font-family":"Atkinson Hyperlegible, sans-serif"},ax).textContent="Personas en casa · cada punto es una persona (n = 20)";
+    sv("text",{x:X1+6,y:64,"text-anchor":"end","font-size":13,fill:"var(--herm-ink)","data-s":3},svg).textContent="más allá del límite";
+    const cnt={}; PEOPLE.forEach(p=>{ const k=cnt[p.casa]=(cnt[p.casa]||0); cnt[p.casa]++;
+      const c=sv("circle",{cx:X(p.casa),cy:base-k*step,r:14,fill:"var(--casa)",stroke:"var(--paper)","stroke-width":2},ax);
+      if(D.out.includes(p.casa)){ c.classList.add("odot"); sv("text",{x:X(p.casa),y:base-k*step-24,"text-anchor":"middle","font-size":13,fill:"var(--text-2)"},ax).textContent=`#${p.id}`; } });
+    const ql=(v,s,lab)=>{const e=g(s); sv("line",{x1:X(v),x2:X(v),y1:84,y2:base+20,stroke:"var(--text)","stroke-width":2,"stroke-dasharray":"6 5"},e); sv("text",{x:X(v),y:76,"text-anchor":"middle","font-size":16,"font-weight":600,fill:"var(--text)"},e).textContent=lab; return e;};
+    ql(D.q1,1,`Q₁ = ${fmt(D.q1)}`); ql(D.q3,2,`Q₃ = ${fmt(D.q3)}`);
+    const ric=g(2); sv("path",{d:`M${X(D.q1)} 104v-8H${X(D.q3)}v8`,fill:"none",stroke:"var(--horas-ink)","stroke-width":2},ric);
+    sv("text",{x:(X(D.q1)+X(D.q3))/2,y:122,"text-anchor":"middle","font-size":15,"font-weight":600,fill:"var(--horas-ink)"},ric).textContent=`RIC = ${fmt(D.iqr)}`;
+    const lim=g(3); sv("line",{x1:X(D.hi),x2:X(D.hi),y1:44,y2:base+20,stroke:"var(--bad)","stroke-width":3},lim);
+    sv("text",{x:X(D.hi)+8,y:100,"font-size":17,"font-weight":600,fill:"var(--bad)"},lim).textContent=`Límite = ${fmt(D.hi)}`;
+    const hot=g(4); D.out.forEach(v=>{ sv("circle",{cx:X(v),cy:base,r:22,fill:"none",stroke:"var(--bad)","stroke-width":3},hot); sv("text",{x:X(v),y:base-46,"text-anchor":"middle","font-size":18,"font-weight":700,fill:"var(--bad)"},hot).textContent=`${v} > ${fmt(D.hi)}`; });
+    const ef=g(5);
+    sv("rect",{x:X(D.mean)-7,y:base+20-7,width:14,height:14,fill:"var(--text)",transform:`rotate(45 ${X(D.mean)} ${base+20})`},ef);
+    sv("rect",{x:X(S2.mean)-7,y:base+20-7,width:14,height:14,fill:"#fff",stroke:"var(--text)","stroke-width":2,transform:`rotate(45 ${X(S2.mean)} ${base+20})`},ef);
+    sv("text",{x:X(D.mean)+12,y:base+70,"font-size":13.5,fill:"var(--text)","font-family":mono},ef).textContent=`◆ con el 10 (n = ${D.n}): ${fmt(D.mean)}`;
+    sv("text",{x:X(S2.mean)-12,y:base+70,"text-anchor":"end","font-size":13.5,fill:"var(--text-2)","font-family":mono},ef).textContent=`◇ sin él (n = ${S2.n}): ≈ ${fmt(S2.mean)}`;
+  }
+};
+
+/* =====================================================================
+   3k · Veredicto (distribución + mini diagramas) y conclusión
+   ===================================================================== */
+const VERD={
+  herm:{forma:["v-neg","Ligera asimetría negativa"],best:"Mediana"},
+  horas:{forma:["v-sim","Casi simétrica"],best:"Media"},
+  casa:{forma:["v-pos","Asimetría positiva"],best:"Mediana"},
+  dep:{forma:["v-cat","No aplica: categórica"],best:()=>`Proporción ${fmtPct(S.dep.mean)} · Moda: Sí`}
+};
+const rel=(a,b)=>a<b?"<":a>b?">":"=";
+SC.veredicto={ build(sl){
+  const tb=$("#vtab tbody",sl);
+  tb.innerHTML=VKEYS.map(k=>{ const D=S[k], v=VERD[k];
+    const cmp=k==="dep"?`x̄ ${fmt(D.mean)} = ${fmtPct(D.mean)} Sí`:`x̄ ${fmt(D.mean)} ${rel(D.mean,D.me)} Me ${fmt(D.me)} ${rel(D.me,D.mo)} Mo ${fmt(D.mo)}`;
+    const dist=k==="dep"?`<b>${D.freq[1].f} Sí · ${D.freq[0].f} No</b><br>la moda es Sí`:
+      `<span style="white-space:nowrap">Me − Q₁ = <b>${fmt(D.dLo)}</b> · Q₃ − Me = <b>${fmt(D.dHi)}</b></span><br>${D.out.length?`atípico: <b>${D.out.join(", ")}</b> (límite ${fmt(D.hi)})`:"sin atípicos"}`;
+    return `<tr data-v="${k}"><td><span class="vn"><i class="c-${k}"></i>${VARS[k].label}</span></td><td class="mono" style="font-size:13.5px;white-space:nowrap">${cmp}</td><td class="dist">${dist}</td><td class="mini2"></td><td><span class="vt ${v.forma[0]}">${v.forma[1]}</span></td><td><b>${typeof v.best==="function"?v.best():v.best}</b></td></tr>`; }).join("");
+  $$("tr",tb).forEach(tr=>{ const k=tr.dataset.v, D=S[k], td=$(".mini2",tr), s=sv("svg",{width:170,height:34,viewBox:"0 0 170 34"}); td.appendChild(s);
+    if(k==="dep"){ sv("rect",{x:4,y:11,width:160,height:12,rx:3,fill:"#D3D7E0"},s); sv("rect",{x:4,y:11,width:160*D.mean,height:12,rx:3,fill:"var(--dep)"},s); return; }
+    const X=v=>8+v*15.4;
+    sv("line",{x1:X(D.wLo),x2:X(D.wHi),y1:17,y2:17,stroke:"var(--text)","stroke-width":1.5},s);
+    sv("rect",{x:X(D.q1),y:8,width:X(D.q3)-X(D.q1),height:18,fill:`var(--${k})`,stroke:"var(--text)","stroke-width":1.2},s);
+    sv("line",{x1:X(D.me),x2:X(D.me),y1:8,y2:26,stroke:"var(--text)","stroke-width":3},s);
+    sv("rect",{x:X(D.mean)-4.5,y:12.5,width:9,height:9,fill:"#fff",stroke:"var(--text)","stroke-width":1.5,transform:`rotate(45 ${X(D.mean)} 17)`},s);
+    D.out.forEach(v=>sv("circle",{cx:X(v),cy:17,r:4,fill:"var(--herm)",stroke:"var(--text)"},s));
+  });
+}};
+SC.conclusion={ build(sl){
+  $$("[data-mini]",sl).forEach(el=>{ const k=el.dataset.mini, D=S[k], s=$("svg",el), ink=k==="casa"?"rgba(11,17,30,.75)":"rgba(255,255,255,.9)";
+    s.setAttribute("viewBox","0 0 240 46");
+    if(k==="dep"){ sv("rect",{x:0,y:16,width:240,height:14,rx:3,fill:"rgba(255,255,255,.25)"},s); sv("rect",{x:0,y:16,width:240*D.mean,height:14,rx:3,fill:"#fff"},s); return; }
+    const [lo,hi]=VARS[k].axis, n=hi-lo+1, w=240/n, cnt={}; D.freq.forEach(r=>cnt[r.x]=r.f);
+    for(let v=lo;v<=hi;v++){ const f=cnt[v]||0, h=f/D.maxF*40; sv("rect",{x:(v-lo)*w+2,y:44-h,width:w-4,height:h,rx:1.5,fill:ink,opacity:v===D.mo?1:.55},s); }
+    sv("line",{x1:0,x2:240,y1:45,y2:45,stroke:ink,"stroke-width":1},s);
+  });
+}};
+
+/* =====================================================================
+   3l · Preguntas al público: opciones y temporizador real de 20 s
+   ===================================================================== */
+const QDUR=20000, CIRC=2*Math.PI*30;
+function buildQuiz(sl){
+  const ok=+sl.dataset.correct, opts=$$(".opt",sl), fb=$(".fb",sl);
+  $(".timer",sl).innerHTML=`<div class="tring"><svg viewBox="0 0 74 74"><circle class="bg" cx="37" cy="37" r="30"/><circle class="fg" cx="37" cy="37" r="30" stroke-dasharray="${CIRC}" stroke-dashoffset="0"/></svg><b>20</b></div>
+    <button class="tbtn" data-t="play" aria-label="Iniciar temporizador"></button>
+    <button class="tbtn" data-t="reset" aria-label="Reiniciar temporizador"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg></button>`;
+  const T=sl._t={left:QDUR,run:false,raf:0,last:0,touched:false,ring:$(".tring",sl),fg:$(".tring .fg",sl),num:$(".tring b",sl),btn:$('[data-t="play"]',sl)};
+  T.draw=()=>{ T.fg.setAttribute("stroke-dashoffset",(CIRC*(1-T.left/QDUR)).toFixed(2)); const done=T.left<=0; T.ring.classList.toggle("done",done); T.num.textContent=done?"Tiempo":Math.ceil(T.left/1000); };
+  T.icon=()=>{ T.btn.innerHTML=T.run?'<svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>':'<svg viewBox="0 0 24 24"><path d="M7 4.5l12 7.5-12 7.5z"/></svg>'; T.btn.setAttribute("aria-label",T.run?"Pausar temporizador":"Iniciar temporizador"); };
+  T.tick=now=>{ if(!T.run) return; T.left=Math.max(0,T.left-(now-T.last)); T.last=now; T.draw(); if(T.left<=0){T.run=false;T.icon();return;} T.raf=requestAnimationFrame(T.tick); };
+  T.start=()=>{ T.touched=true; if(T.left<=0) T.left=QDUR; T.run=true; T.last=performance.now(); cancelAnimationFrame(T.raf); T.raf=requestAnimationFrame(T.tick); T.icon(); };
+  T.stop=()=>{ T.run=false; cancelAnimationFrame(T.raf); T.icon(); };
+  T.reset=()=>{ T.stop(); T.left=QDUR; T.draw(); };
+  T.auto=()=>{ if(!T.touched&&!T.run&&!sl._answered) T.start(); };
+  T.btn.addEventListener("click",e=>{e.stopPropagation(); T.run?T.stop():T.start();});
+  $('[data-t="reset"]',sl).addEventListener("click",e=>{e.stopPropagation(); T.reset(); T.touched=true;});
+  T.icon(); T.draw();
+  const clear=document.createElement("button"); clear.className="clear"; clear.textContent="Borrar respuesta"; clear.hidden=true; $(".qfoot",sl).appendChild(clear);
+  sl._reset=()=>{ sl._answered=false; sl.classList.remove("answered"); opts.forEach(o=>{o.classList.remove("correct","wrong","dimmed"); $(".om",o).innerHTML=""; o.removeAttribute("aria-pressed");}); fb.className="fb"; fb.innerHTML=""; clear.hidden=true; };
+  clear.addEventListener("click",e=>{e.stopPropagation(); sl._reset(); opts[0].focus();});
+  sl._choose=i=>{
+    if(sl._answered) return; sl._answered=true; sl.classList.add("answered"); T.stop();
+    opts.forEach((o,j)=>{ o.setAttribute("aria-pressed",String(j===i));
+      if(j===ok){o.classList.add("correct"); $(".om",o).innerHTML=`<svg><use href="#i-ok"/></svg>Correcta`;}
+      else if(j===i){o.classList.add("wrong"); $(".om",o).innerHTML=`<svg><use href="#i-ko"/></svg>Elegida`;}
+      else o.classList.add("dimmed"); });
+    if(i===ok){ fb.className="fb ok"; fb.innerHTML=`<svg><use href="#i-ok"/></svg>¡Correcto! Muy bien.`; burst(sl,opts[ok]); }
+    else { fb.className="fb ko"; fb.innerHTML=`<svg><use href="#i-ko"/></svg>Casi. La correcta está marcada con ✓; la explicamos en la siguiente.`; }
+    clear.hidden=false;
+  };
+  opts.forEach((o,i)=>o.addEventListener("click",e=>{e.stopPropagation(); sl._choose(i);}));
+}
+function rectIn(el){ const s=stage.getBoundingClientRect(), r=el.getBoundingClientRect(); return {x:(r.left-s.left)/st.scale,y:(r.top-s.top)/st.scale,w:r.width/st.scale,h:r.height/st.scale}; }
+function burst(sl,opt){
+  if(!st.motion) return; const r=rectIn(opt), cx=r.x+r.w-60, cy=r.y+r.h/2, cols=["--herm-l","--horas-l","--casa-l","--dep-l"].map(css);
+  for(let k=0;k<20;k++){ const d=document.createElement("i"); d.className="burst"; d.style.left=cx+"px"; d.style.top=cy+"px"; d.style.background=cols[k%4]; sl.appendChild(d);
+    const a=k/20*Math.PI*2, dist=50+(k%3)*14;
+    const an=d.animate([{transform:"translate(-50%,-50%) scale(1)",opacity:1},{transform:`translate(calc(-50% + ${Math.cos(a)*dist}px),calc(-50% + ${Math.sin(a)*dist}px)) scale(.4)`,opacity:0}],{duration:620,easing:EASE,fill:"forwards"});
+    an.onfinish=()=>d.remove(); an.oncancel=()=>d.remove(); }
+}
+$$(".quiz").forEach(sl=>SC[sl.id]={build:buildQuiz,
+  /* El temporizador arranca cuando la pregunta y sus opciones terminaron de entrar (o de inmediato sin movimiento). */
+  enter(sl){ const T=sl._t; T.reset(); T.touched=false; const tok=sl._tok=(sl._tok||0)+1;
+    const anims=[...sl.getAnimations(),...$$(".qt,.opts,.opt",sl).flatMap(e=>e.getAnimations())];
+    Promise.all(anims.map(a=>a.finished)).then(()=>{ if(sl._tok===tok&&slides[st.i]===sl) T.auto(); },()=>{}); },
+  leave(sl){ sl._tok=(sl._tok||0)+1; sl._t&&sl._t.stop(); $$(".burst",sl).forEach(b=>b.remove()); }});
+
+/* =====================================================================
+   3m · Transiciones con elementos compartidos (solo correspondencias reales)
+   ===================================================================== */
+const LINKS={
+  /* cada una de las 80 respuestas de la matriz viaja a su celda en la tabla de datos brutos */
+  "preguntas>brutos":{
+    capture(old){ if(!old._cells||!visible(old._cells[0])) return null; return old._cells.map(c=>({k:c.dataset.k,id:+c.dataset.col,r:rectIn(c),t:c.textContent})); },
+    play(nu,data){ data.forEach(d=>{ const td=rawCell(nu,d.id,d.k); if(!td) return; const ki=VKEYS.indexOf(d.k), delay=ki*90+(d.id-1)*12;
+      ghost(d.r,rectIn(td),{text:d.t,bg:css("--"+d.k),fg:d.k==="casa"?css("--ink"):"#fff",bg2:"rgba(255,255,255,0)",fg2:css("--text"),fs:"14px",delay,dur:620});
+      anim(td,[{opacity:0},{opacity:1}],{duration:140,delay:delay+600}); }); }
+  },
+  /* la columna Hermanos de cada persona se convierte en su ficha */
+  "brutos>f-herm":{
+    capture(old){ return PEOPLE.map(p=>{ const td=rawCell(old,p.id,"herm"); return visible(td)?{id:p.id,r:rectIn(td),t:td.textContent}:null; }).filter(Boolean); },
+    play(nu,data){ const chips=nu._fq.chips; data.forEach((d,j)=>{ const c=chips[d.id-1]; const delay=j*20;
+      ghost(d.r,rectIn(c.el),{text:d.t,bg:css("--herm-t"),fg:css("--text"),bg2:"#ffffff",border:css("--herm"),fs:st.step>=2?"16px":"20px",delay,dur:620,radius:"8px"});
+      anim(c.el,[{opacity:0},{opacity:1}],{duration:140,delay:delay+590}); }); }
+  },
+  /* los datos en las posiciones 5 y 6 pasan a ser a y b; la posición 5,25 pasa a su eje */
+  "posiciones>interp":{
+    capture(old){ const q=S.herm.Q1, a=$(`.qchip[data-pos="${q.k}"]`,old), b=$(`.qchip[data-pos="${q.k+1}"]`,old), tag=$$(".qtag",old)[0];
+      return {a:rectIn(a),b:rectIn(b),ta:a.textContent,tb:b.textContent,tag:visible(tag)?rectIn(tag):null}; },
+    play(nu,d){ const e=nu._ends, sr=rectIn($("#isvg",nu)), P=(p,w,h,dy)=>({x:sr.x+p.x-w/2,y:sr.y+p.y-h/2+(dy||0),w,h});
+      [[d.a,d.ta,e.a],[d.b,d.tb,e.b]].forEach(([r,t,p],i)=>ghost(r,P(p,34,34),{text:t,bg:"#ffffff",fg:css("--text"),border:css("--herm"),bg2:css("--ink"),fg2:"#ffffff",border2:css("--on-ink"),radius2:"50%",fs:"16px",delay:i*90,dur:760,fadeOut:true}));
+      if(d.tag) ghost(d.tag,P(e.pos,150,26,-22),{text:"posición 5,25",bg:css("--text"),fg:css("--paper"),bg2:"rgba(0,0,0,0)",fg2:css("--q"),fs:"14px",delay:60,dur:760,fadeOut:true}); }
+  },
+  /* el punto atípico del diagrama de caja es la misma persona (#8) en el gráfico de puntos */
+  "box>atipico":{
+    capture(old){ const c=$(".bout",old); return visible(c)?{r:rectIn(c)}:null; },
+    play(nu,d){ const dot=$(".odot",nu); ghost(d.r,rectIn(dot),{bg:css("--herm"),bg2:css("--casa"),border:css("--text"),border2:css("--paper"),radius:"50%",radius2:"50%",dur:820});
+      anim(dot,[{opacity:0},{opacity:1}],{duration:150,delay:800}); }
+  }
+};
+
+/* =====================================================================
+   4 · MOTOR DE NAVEGACIÓN
+   ===================================================================== */
+const maxStep=sl=>(+sl.dataset.steps||1)-1;
+const seqOf=sl=>sl._seq?sl._seq():Array.from({length:maxStep(sl)+1},(_,k)=>k);
+const stepName=(sl,k)=>{const sc=SC[sl.id]; const n=(sc&&sc.names)||(sl.dataset.stepnames?sl.dataset.stepnames.split("|"):null); return n?n[k]:null;};
+let exitAnim=null;
+function applyAll(sl,step,animate,prev){ applyGeneric(sl,step,animate); const sc=SC[sl.id]; if(sc&&sc.apply) sc.apply(sl,step,animate,prev); }
+function setStep(k){
+  const sl=slides[st.i]; k=Math.max(0,Math.min(maxStep(sl),k)); if(k===st.step) return;
+  finishAll(sl); fly.replaceChildren(); const prev=st.step; st.step=k; applyAll(sl,k,true,prev); ui();
+}
+function chapterStart(n){ return n>0 && +slides[n].dataset.ch!==+slides[n-1].dataset.ch && +slides[n].dataset.ch>=1 && +slides[n].dataset.ch<=4; }
+function go(n,spec,dir){
+  n=Math.max(0,Math.min(slides.length-1,n));
+  const old=slides[st.i], nu=slides[n]; dir=dir==null?(n>=st.i?1:-1):dir;
+  let flip=null, link=null;
+  if(old!==nu && n===st.i+1 && dir>0 && st.motion){
+    finishAll(old);
+    if(old.classList.contains("quiz")&&old._answered){ const c=$(".opt.correct",old); if(c) flip=rectIn(c); }
+    const L=LINKS[old.id+">"+nu.id]; if(L){ try{ const data=L.capture(old); if(data&&(!Array.isArray(data)||data.length)) link={L,data}; }catch(e){ console.warn(e); } }
+  }
+  if(exitAnim){ exitAnim.onfinish=null; exitAnim.cancel(); exitAnim=null; }
+  finishAll(); clearLater(); fly.replaceChildren();
+  if(old!==nu){ const sc=SC[old.id]; if(sc&&sc.leave) sc.leave(old); }
+  slides.forEach(s=>{ s.hidden=s!==nu; s.style.zIndex=""; });
+  st.i=n; nu.hidden=false;
+  const target=st.all?maxStep(nu):spec==="max"?maxStep(nu):0; const prev=st.step; st.step=target;
+  applyAll(nu,target,false,prev);
+  const wipe=!link && old!==nu && dir>0 && chapterStart(n) && st.motion;
+  const d=wipe?520:link?160:90;
+  if(old!==nu && st.motion){
+    old.hidden=false; old.style.zIndex=1; nu.style.zIndex=2;
+    const a=old.animate(link?[{opacity:1},{opacity:0}]:[{opacity:1,transform:"none"},{opacity:0,transform:`translateX(${-36*dir}px)`}],{duration:link?260:460,easing:EASE,fill:"forwards"});
+    exitAnim=a; a.onfinish=()=>{ old.hidden=true; a.cancel(); if(exitAnim===a) exitAnim=null; };
+    if(link) nu.animate([{opacity:0},{opacity:1}],{duration:320,delay:100,easing:EASE,fill:"backwards"});
+    else if(!flip) nu.animate([{opacity:0,transform:`translateX(${40*dir}px)`},{opacity:1,transform:"none"}],{duration:T_SCENE,delay:wipe?380:0,easing:EASE,fill:"backwards"});
+  }
+  if(wipe){ const ch=+nu.dataset.ch; $("#wipe-n").textContent=`0${ch} / 04`; $("#wipe-t").textContent=CHAPTERS[ch];
+    $("#wipe").animate([{transform:"translateX(101%)"},{transform:"translateX(0)",offset:.38},{transform:"translateX(0)",offset:.6},{transform:"translateX(-101%)"}],{duration:950,easing:EASE_IO}); }
+  if(dir>=0 && target===0 && st.motion) enterGeneric(nu,d);
+  const sc=SC[nu.id]; if(sc&&sc.enter && (dir>=0||st.all||nu.dataset.intro==null)) sc.enter(nu,d,{link:!!link,dir});
+  if(link) link.L.play(nu,link.data);
+  if(flip){ const big=$("[data-flip]",nu); if(big){ const r=rectIn(big), s=flip.h/r.h;
+    anim(big,[{transform:`translate(${flip.x-r.x}px,${flip.y-r.y}px) scale(${s})`,opacity:.4},{transform:"none",opacity:1}],{duration:760,easing:EASE}); } }
+  try{ history.replaceState(null,"","#"+(n+1)); }catch(e){}
+  store.set("slide",n);
+  ui();
+}
+function next(){ const sl=slides[st.i];
+  if(sl.dataset.intro!=null && isRunning(sl)){ finishAll(sl); return; }
+  const nx=seqOf(sl).find(k=>k>st.step);
+  if(nx!==undefined) setStep(nx); else if(st.i<slides.length-1) go(st.i+1,0,1); }
+function prev(){ const sl=slides[st.i]; const pv=seqOf(sl).filter(k=>k<st.step).pop();
+  if(pv!==undefined) setStep(pv); else if(st.step>0) setStep(0); else if(st.i>0) go(st.i-1,"max",-1); }
+
+/* ---------- interfaz ---------- */
+const bar={count:$("#count"),dots:$("#stepdots"),spk:$("#spk"),fill:$("#progfill"),nextLbl:$("#nextLbl")};
+function ui(){
+  const sl=slides[st.i], sp=SPEAKERS[sl.dataset.speaker], seq=seqOf(sl), pos=seq.indexOf(st.step), m=seq.length;
+  bar.count.innerHTML=`<b>${st.i+1}</b> / ${slides.length}`;
+  bar.dots.innerHTML=m>1?seq.map((k,j)=>`<i class="${k<=st.step?"on":""} ${k===st.step?"now":""}"></i>`).join(""):"";
+  bar.dots.title=m>1?`Paso ${Math.max(pos,0)+1} de ${m}`:"";
+  bar.spk.innerHTML=`<i style="background:${sp.c}"></i>${sp.n}`;
+  bar.fill.style.width=((st.i+1)/slides.length*100)+"%";
+  const more=seq.some(k=>k>st.step);
+  bar.nextLbl.textContent=more?`Paso ${pos+2} de ${m}`:st.i<slides.length-1?"Siguiente diapositiva":"Fin";
+  $("#bAll").setAttribute("aria-pressed",String(st.all));
+  $("#bMotion").setAttribute("aria-pressed",String(!st.motion));
+  $("#motionLbl").textContent=`Movimiento: ${st.motion?"completo":"reducido"}${st.motionManual?"":" (sistema)"}`;
+  document.documentElement.classList.toggle("still",!st.motion);
+  if(sl._fq) stepperState(sl);
+  if(st.drawer) renderDrawer();
+  $$("#ixGrid .ix").forEach(b=>b.classList.toggle("cur",+b.dataset.go===st.i));
+}
+/* panel lateral: guion, reparto y revisión */
+const AUDIT=[
+  ["Veredicto (23)","La regla «x̄ ≈ Me → simétrica» se presenta como pista, no como prueba. Se añadió lo que muestra la distribución: Me − Q₁ frente a Q₃ − Me y los atípicos. Hermanos: 1,25 frente a 0,5 y sin atípicos → ligera asimetría negativa. Horas: 2,75 frente a 2, sin atípicos y media ≈ mediana → casi simétrica. Casa: caja pareja (1 y 1), pero el 10 es atípico y alarga la cola derecha → asimetría positiva. Se quitó la columna «¿Media sirve? Sí/No»."],
+  ["Por qué (26)","Se quitaron los «Media: NO». Cada variable explica qué resume la media y por qué se prefiere otra medida. Hermanos ya no se atribuye a extremos: no hay atípicos (límite inferior −1,375); la media baja porque 5 de las 20 personas tienen 0 o 1 hermano."],
+  ["Pregunta difícil (6, 23, 26)","La media 0,55 es la proporción de Sí (55 %). La moda (Sí) es la categoría más frecuente: son dos resúmenes distintos. En el guion 6 se quitó «no tiene sentido sacar un promedio»."],
+  ["Conclusión (27)","«3 personas viven en cada casa» → valor típico (Me = Mo = 3). «2 a 3 hermanos» → mediana 2,5, moda 3. Ya no dice que hermanos y casa se desvían por valores extremos: solo casa tiene un atípico. Se limita a las 20 personas encuestadas."],
+  ["Sueldos (15)","La media de $5 900 está bien calculada; no coincidir con un sueldo real no la invalida. Se explica que 9 de 10 ganan 1 000 y un solo sueldo la sube, por eso la mediana describe mejor el sueldo típico."],
+  ["Notas 80–95 (29)","Saber que todas están entre 80 y 95 implica que ningún dato queda muy lejos, pero no prueba simetría. Se dice así."],
+  ["Edades (25)","x̄ > Me se presenta como pista, confirmada con la distribución (nueve edades juntas y un 45 atípico)."],
+  ["Caso del 10 (22)","Con el 10: 69 ÷ 20 = 3,45. Sin el 10: 59 ÷ 19 ≈ 3,11. Se indica que la muestra cambia de 20 a 19 y que excluirlo es solo una comparación: el dato sigue en el estudio."],
+  ["Diagrama de caja (21)","Se mantiene la diferencia entre el máximo observado (10) y el extremo del bigote (6). Ahora Q₁, Me y Q₃ se rotulan sobre sus marcas."],
+  ["Guion 12","Se eliminó «Sor Adriana vive en comunidad»: no estaba confirmado. Se mantiene su registro (#8) y su respuesta (10)."],
+  ["Criterio","Las etiquetas «ligera», «casi simétrica» y la elección de la medida del centro son juicios del grupo apoyados en los datos, no demostraciones."]
+];
+function renderDrawer(){
+  const b=$("#dwBody"), sl=slides[st.i];
+  $$(".dw-tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.tab===st.tab)));
+  if(st.tab==="notes"){
+    const sp=SPEAKERS[sl.dataset.speaker], seq=seqOf(sl), nx=slides[st.i+1], nsp=nx&&SPEAKERS[nx.dataset.speaker], sn=stepName(sl,st.step);
+    b.innerHTML=`<h3>${st.i+1}. ${sl.dataset.title}</h3><div class="who"><i style="background:${sp.c}"></i>${sp.n}</div>
+      ${seq.length>1?`<div class="stepinfo">Paso ${seq.indexOf(st.step)+1} de ${seq.length}${sn?" · "+sn:""}${sl._fq?(sl._short?" · recorrido abreviado":" · recorrido completo"):""}</div>`:""}
+      <div class="note">${sl._notes}</div>${FIXED_NOTES.has(sl.id)?`<span class="fix">El guion de esta diapositiva se corrigió; ver la pestaña Revisión.</span>`:""}
+      ${nx?`<div class="nextup">Después: <b style="color:var(--on-ink)">${st.i+2}. ${nx.dataset.title}</b> · <span style="color:${nsp.c}">●</span> ${nsp.n}</div>`:""}
+      <div class="warn">Este panel aparece en la misma pantalla. Si proyectan duplicando la pantalla, el público también lo ve. Para leerlo sin que se proyecte, usen la pantalla en modo «extender» y dejen la presentación en el proyector.</div>`;
+  } else if(st.tab==="rep"){
+    b.innerHTML=Object.entries(SPEAKERS).map(([k,p])=>{ const items=slides.map((s,i)=>[s,i]).filter(([s])=>s.dataset.speaker===k);
+      return `<div class="rep-sec"><h4><i style="background:${p.c}"></i>${p.n} <small>· ${p.r} · ${items.length} diapositivas</small></h4>${items.map(([s,i])=>`<button class="rep-li ${i===st.i?"cur":""}" data-go="${i}"><b>${i+1}</b>${s.dataset.title}</button>`).join("")}</div>`; }).join("");
+  } else {
+    const okI=INDEP.filter(c=>c.ok).length, okP=CHECKS.filter(c=>c.ok).length;
+    b.innerHTML=`<div class="aud"><h3>Revisión matemática</h3><p style="margin:4px 0 0">Todos los valores se calculan en el código desde los 20 registros, con el método del proyecto: posición (n + 1)·p e interpolación.</p>
+      <h4>Correcciones de esta versión</h4><ol>${AUDIT.map(([t,d])=>`<li><b style="color:var(--on-ink)">${t}.</b> ${d}</li>`).join("")}</ol>
+      <h4>Comprobación independiente: ${okI} de ${INDEP.length}</h4><p style="margin:0 0 6px;font-size:13px">Recalculado sin usar la función principal: conteo directo, suma con bucle y ordenamiento aparte.</p>
+      <div class="chk">${INDEP.map(c=>`<span>${c.name} = ${fmt(c.a)}</span><span class="${c.ok?"y":"n"}">${c.ok?"✓":"✗ "+fmt(c.b)}</span>`).join("")}</div>
+      <h4>Cambios accidentales frente a la versión anterior: ${CHECKS.length-okP}</h4></div>`;
+  }
+}
+function openDrawer(tab){ if(st.drawer&&st.tab===tab){ closeDrawer(); return; } st.tab=tab; st.drawer=true; app.classList.add("drawer-open"); renderDrawer(); }
+function closeDrawer(){ st.drawer=false; app.classList.remove("drawer-open"); }
+$$(".dw-tab").forEach(t=>t.addEventListener("click",()=>{st.tab=t.dataset.tab; renderDrawer();}));
+$("#dwClose").addEventListener("click",closeDrawer);
+$("#dwBody").addEventListener("click",e=>{const b=e.target.closest("[data-go]"); if(b) go(+b.dataset.go,0);});
+
+/* índice: foco atrapado, Escape cierra y el foco vuelve a quien lo abrió */
+let ixOpener=null;
+function buildIndex(){
+  let h="", lastCh=-1;
+  slides.forEach((s,i)=>{ const ch=+s.dataset.ch, sp=SPEAKERS[s.dataset.speaker];
+    if(ch!==lastCh){ h+=`<div class="chap">${ch>=1&&ch<=4?"0"+ch+" · ":""}${CHAPTERS[ch]}</div>`; lastCh=ch; }
+    h+=`<button class="ix ${s.classList.contains("quiz")?"isq":""}" data-go="${i}"><span class="n">${String(i+1).padStart(2,"0")}${s.classList.contains("quiz")?" · pregunta":""}${maxStep(s)?" · "+(maxStep(s)+1)+" pasos":""}</span><span class="tt">${s.dataset.title}</span><span class="sp"><i style="background:${sp.c}"></i>${sp.n}</span></button>`; });
+  $("#ixGrid").innerHTML=h;
+  $("#ixGrid").addEventListener("click",e=>{const b=e.target.closest("[data-go]"); if(b){ toggleIndex(false); go(+b.dataset.go,0); }});
+  $("#index").addEventListener("keydown",e=>{ if(e.key!=="Tab") return; const f=$$("#index button"); const i=f.indexOf(document.activeElement); e.preventDefault(); f[(i+(e.shiftKey?-1:1)+f.length)%f.length].focus(); });
+}
+function toggleIndex(on){
+  const ix=$("#index"); on=on==null?ix.hidden:on; if(on===!ix.hidden) return;
+  ix.hidden=!on;
+  if(on){ ixOpener=document.activeElement; const c=$(`.ix[data-go="${st.i}"]`); (c||$("#ixClose")).focus(); }
+  else { const o=ixOpener; ixOpener=null; if(o&&o!==document.body&&document.contains(o)&&o.offsetParent!==null) o.focus(); else $("#bIndex").focus(); }
+}
+function buildProg(){ const p=$("#prog"); slides.forEach((s,i)=>{ if(chapterStart(i)){ const t=document.createElement("i"); t.className="tick"; t.style.left=(i/slides.length*100)+"%"; p.appendChild(t);} });
+  p.addEventListener("click",e=>{ const r=p.getBoundingClientRect(); go(Math.min(slides.length-1,Math.floor((e.clientX-r.left)/r.width*slides.length)),0); }); }
+
+/* ---------- controles ---------- */
+$("#bPrev").addEventListener("click",prev);
+$("#bNext").addEventListener("click",next);
+$("#bSkip").addEventListener("click",()=>go(st.i+1,0,1));
+$("#bIndex").addEventListener("click",()=>toggleIndex());
+$("#ixClose").addEventListener("click",()=>toggleIndex(false));
+$("#bNotes").addEventListener("click",()=>openDrawer("notes"));
+function toggleAll(){ st.all=!st.all; if(st.all) setStep(maxStep(slides[st.i])); ui(); toast(st.all?"Escenas completas: activado en toda la presentación":"Escenas completas: desactivado (se vuelve a los pasos)"); }
+function toggleMotion(){ st.motion=!st.motion; st.motionManual=true; if(!st.motion) finishAll(); store.set("motion",st.motion?"1":"0"); ui(); toast(st.motion?"Movimiento completo activado":"Movimiento reducido activado"); }
+mq.addEventListener&&mq.addEventListener("change",e=>{ if(!st.motionManual){ st.motion=!e.matches; if(!st.motion) finishAll(); ui(); } });
+$("#bAll").addEventListener("click",toggleAll);
+$("#bMotion").addEventListener("click",toggleMotion);
+const fsOK=!!(document.fullscreenEnabled&&document.documentElement.requestFullscreen);
+if(!fsOK) $("#bFs").hidden=true;
+function toggleFs(){ if(!fsOK) return; const p=document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen(); p&&p.catch&&p.catch(()=>{}); }
+$("#bFs").addEventListener("click",toggleFs);
+/* táctil: un deslizamiento avanza una sola vez; el clic sintético posterior se ignora */
+let lastSwipe=0, tx=null, ty=null;
+stage.addEventListener("click",e=>{
+  if(Date.now()-lastSwipe<700) return;
+  if(e.target.closest("button,a,input,select,textarea,[tabindex],.nonav,table")) return;
+  const r=stage.getBoundingClientRect(); (e.clientX<r.left+r.width*.25)?prev():next();
+});
+stage.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+stage.addEventListener("touchend",e=>{ if(tx==null) return; const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){ lastSwipe=Date.now(); (dx<0?next:prev)(); } tx=null; },{passive:true});
+addEventListener("keydown",e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  const ixOpen=!$("#index").hidden, k=e.key, onBtn=e.target.closest&&e.target.closest("button,input,textarea,select,[role=button]");
+  if(k==="Escape"){ if(ixOpen) toggleIndex(false); else if(st.drawer) closeDrawer(); return; }
+  if(ixOpen){ if(k==="i"||k==="I") toggleIndex(false); return; }
+  if((k===" "||k==="Enter")&&onBtn) return;
+  if(k==="ArrowRight"||k==="PageDown"||k===" "){ e.preventDefault(); e.shiftKey?go(st.i+1,0,1):next(); }
+  else if(k==="ArrowLeft"||k==="PageUp"){ e.preventDefault(); e.shiftKey?go(st.i-1,"max",-1):prev(); }
+  else if(k==="Home"){ go(0,0); } else if(k==="End"){ go(slides.length-1,0); }
+  else if(k==="n"||k==="N") openDrawer("notes");
+  else if(k==="r"||k==="R") openDrawer("rep");
+  else if(k==="i"||k==="I") toggleIndex(true);
+  else if(k==="v"||k==="V") toggleAll();
+  else if(k==="m"||k==="M") toggleMotion();
+  else if(k==="f"||k==="F") toggleFs();
+  else if(k==="t"||k==="T"){ const T=slides[st.i]._t; if(T) T.run?T.stop():T.start(); }
+  else if(/^[a-dA-D]$/.test(k)&&slides[st.i].classList.contains("quiz")){ const os=$$(".opt",slides[st.i]), o=os[k.toUpperCase().charCodeAt(0)-65]; if(o){ o.focus(); slides[st.i]._choose(os.indexOf(o)); } }
+});
+document.addEventListener("visibilitychange",()=>{ if(document.hidden){ const T=slides[st.i]._t; if(T) T.stop(); } });
+
+/* ---------- escala del escenario y aviso de legibilidad ---------- */
+let smallDismissed=false;
+function fit(){ const vp=$("#viewport"), pt=parseFloat(getComputedStyle(vp).paddingTop)||0, w=vp.clientWidth, h=vp.clientHeight-pt;
+  st.scale=Math.max(.1,Math.min((w-16)/1280,(h-16)/720)); stage.style.transform=`translate(-50%,-50%) scale(${st.scale})`;
+  stage.style.top=`calc(50% + ${pt/2}px)`;
+  /* con escala < 0,55 el texto de 17 px queda por debajo de ~9 px reales */
+  $("#smallnote").hidden=smallDismissed||st.scale>=.55; }
+$("#smallX").addEventListener("click",()=>{smallDismissed=true; $("#smallnote").hidden=true;});
+new ResizeObserver(fit).observe($("#viewport")); addEventListener("resize",fit);
+
+/* ---------- arranque ---------- */
+slides.forEach(fillTemplates);
+slides.forEach((s,i)=>chrome(s,i));
+slides.forEach(s=>{ const sc=SC[s.id]; if(sc&&sc.build) sc.build(s); s.hidden=true; applyAll(s,0,false,0); });
+buildIndex(); buildProg(); fit();
+INDEP.filter(c=>!c.ok).forEach(c=>console.error("Cálculo independiente distinto:",c));
+CHECKS.filter(c=>!c.ok).forEach(c=>console.warn("Valor distinto al de la versión anterior:",c));
+let start=0; const hm=location.hash.match(/^#(\d+)$/);
+if(hm) start=+hm[1]-1; else { const s=store.get("slide"); if(s!==null) start=+s||0; }
+st.i=Math.max(0,Math.min(slides.length-1,start)); slides[st.i].hidden=false;
+go(st.i,0,1);
+
+</script>
+</body>
+</html>
